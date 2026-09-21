@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  // No `url` here — Prisma 7 removed it from schema.prisma. The CLI's own
+  // connection (db push / migrate / introspect) is configured in
+  // prisma.config.ts instead. The app's runtime client reads the same
+  // DATABASE_URL (a Neon connection string) via @prisma/adapter-neon (see
+  // lib/withPrisma.ts).
+}
+
+enum EmployeeRole {
+  EMPLOYEE
+  SUPERUSER
+}
+
+enum ClockEventType {
+  CLOCK_IN
+  CLOCK_OUT
+}
+
+/// Who initiated a ClockEvent write: the employee themselves via the IP-gated
+/// route, or a superuser correcting a record in /timesheets.
+enum ClockEventSource {
+  EMPLOYEE_SELF
+  SUPERUSER_EDIT
+}
+
+/// How often a ChecklistItem resets. ONE_TIME never resets — once checked it
+/// stays checked until someone unchecks it or it's deleted.
+enum ChecklistRecurrence {
+  ONE_TIME
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+/// Users and employees are the same entity (per ideas.md) — every account
+/// that can log in is an Employee, distinguished only by `role`.
+model Employee {
+  id                  String        @id @default(cuid())
+  code                String        @unique
+  codeHash            String        @map("code_hash")
+  firstName           String        @map("first_name")
+  lastName            String        @map("last_name")
+  role                EmployeeRole  @default(EMPLOYEE)
+  phone               String?
+  preferredWorkplaceId String?      @map("preferred_workplace_id")
+  preferredWorkplace  Workplace?    @relation("EmployeePreferredWorkplace", fields: [preferredWorkplaceId], references: [id])
+  /// Freeform text for now (e.g. "prefers mornings, not available Sundays") —
+  /// not structured day/time rows, so it can't be queried/filtered later
+  /// without a redesign. Acceptable for v1: it's a note, not a schedule input.
+  availabilityNote    String?       @db.Text @map("availability_note")
+  locale              String        @default("fr")
+  /// Soft-disable instead of deleting, so historical Shift/ClockEvent rows
+  /// keep a valid employee reference.
+  active              Boolean       @default(true)
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+
+  shifts              Shift[]
+  clockEvents         ClockEvent[]  @relation("EmployeeClockEvents")
+  editedClockEvents   ClockEvent[]  @relation("EditedByEmployee")
+  completedChecklistItems ChecklistItem[] @relation("ChecklistCompletedBy")
+
+  @@map("employees")
+}
+
+/// Mirrors artur's GalleryLocation (mont-royal, vieux-port) — copied, not
+/// shared, since clockin has its own database. `allowedCidr` is a single
+/// CIDR/subnet string for v1; widen to a list later if a location needs more.
+model Workplace {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  label       String
+  allowedCidr String   @map("allowed_cidr")
+  /// Hex color (e.g. "#0ea5e9") used to visually distinguish this workplace
+  /// wherever it's shown (shift cards, timesheets, etc.).
+  color       String   @default("#0ea5e9")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  preferredByEmployees Employee[]   @relation("EmployeePreferredWorkplace")
+  shifts               Shift[]
+  clockEvents          ClockEvent[]
+
+  @@map("workplaces")
+}
+
+/// A planned work period. Combined start/end DateTime (not a separate
+/// date + timeStart + timeEnd triplet) to avoid timezone-split bugs. Superuser
+/// adds/edits/deletes on the /schedule page.
+model Shift {
+  id          String   @id @default(cuid())
+  employeeId  String   @map("employee_id")
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  workplaceId String   @map("workplace_id")
+  workplace   Workplace @relation(fields: [workplaceId], references: [id])
+  startAt     DateTime @map("start_at")
+  endAt       DateTime @map("end_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  clockEvents ClockEvent[]
+
+  @@index([employeeId, startAt])
+  @@index([workplaceId, startAt])
+  @@map("shifts")
+}
+
+/// The actual clock-in/out ledger — what a superuser reads and corrects in
+/// /timesheets. Distinct from Shift (planned time): "hours worked" is derived
+/// from IN/OUT pairs at read time, not stored as a redundant duration.
+model ClockEvent {
+  id                 String            @id @default(cuid())
+  employeeId         String            @map("employee_id")
+  employee           Employee          @relation("EmployeeClockEvents", fields: [employeeId], references: [id], onDelete: Cascade)
+  /// Best-effort link to the shift this event most likely belongs to — never
+  /// required for the write to succeed.
+  shiftId            String?           @map("shift_id")
+  shift              Shift?            @relation(fields: [shiftId], references: [id])
+  type               ClockEventType
+  at                 DateTime          @default(now())
+  /// Which workplace's allowedCidr the request IP matched — null only if a
+  /// superuser creates a manual correction with no network context.
+  workplaceId        String?           @map("workplace_id")
+  workplace          Workplace?        @relation(fields: [workplaceId], references: [id])
+  ip                 String            @db.VarChar(45)
+  source             ClockEventSource
+  /// Stamped when a superuser edits a row that isn't their own.
+  editedByEmployeeId String?           @map("edited_by_employee_id")
+  editedByEmployee   Employee?         @relation("EditedByEmployee", fields: [editedByEmployeeId], references: [id])
+  note               String?           @db.Text
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+
+  @@index([employeeId, at])
+  @@map("clock_events")
+}
+
+/// Backs the /links docs page.
+model Link {
+  id        String   @id @default(cuid())
+  title     String
+  url       String   @db.VarChar(500)
+  category  String?
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("links")
+}
+
+/// Shared team checklist — not in the original plan, added on request. Any
+/// employee can check an item; only the employee who checked it, or a
+/// superuser, can uncheck it. Only a superuser can add, edit, or delete
+/// items. `completed` is a single shared state (not per-employee).
+///
+/// Recurring items (DAILY/WEEKLY/MONTHLY) don't get auto-reset by a job —
+/// `completed`/`completedAt` just record the last time someone checked it,
+/// and the app computes whether that still counts for the current
+/// day/week/month at read time (see lib/checklist/effectiveCompletion.ts).
+model ChecklistItem {
+  id                  String              @id @default(cuid())
+  label               String              @db.Text
+  recurrence          ChecklistRecurrence @default(ONE_TIME)
+  completed           Boolean             @default(false)
+  completedAt         DateTime?           @map("completed_at")
+  completedByEmployeeId String?           @map("completed_by_employee_id")
+  completedByEmployee Employee?           @relation("ChecklistCompletedBy", fields: [completedByEmployeeId], references: [id])
+  sortOrder           Int                 @default(0) @map("sort_order")
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+
+  @@map("checklist_items")
+}

@@ -1,0 +1,28 @@
+import type { Translation } from "./types";
+
+export const scheduleCalendarTranslations: Record<string, Translation> = {
+    week: { en: "Week", fr: "Semaine" },
+    today: { en: "Today", fr: "Aujourd'hui" },
+    noShifts: { en: "No shifts scheduled", fr: "Aucun shift prévu" },
+    showAllShifts: { en: "Everyone", fr: "Tout le monde" },
+    showMyShifts: { en: "Me", fr: "Moi" },
+    loading: { en: "Loading...", fr: "Chargement..." },
+    addShift: { en: "Add a shift", fr: "Ajouter un shift" },
+    editShift: { en: "Edit", fr: "Modifier" },
+    deleteShift: { en: "Delete", fr: "Supprimer" },
+    save: { en: "Save", fr: "Enregistrer" },
+    cancel: { en: "Cancel", fr: "Annuler" },
+    employeeLabel: { en: "Employee", fr: "Employé" },
+    workplaceLabel: { en: "Workplace", fr: "Lieu" },
+    startAtLabel: { en: "Start", fr: "Début" },
+    endAtLabel: { en: "End", fr: "Fin" },
+    saveError: { en: "Something went wrong, please try again.", fr: "Une erreur est survenue, réessaie." },
+    previousWeek: { en: "Previous week", fr: "Semaine précédente" },
+    nextWeek: { en: "Next week", fr: "Semaine suivante" },
+    thisWeek: { en: "This week", fr: "Cette semaine" },
+    copyWeek: { en: "Copy week", fr: "Copier la semaine" },
+    copyWeekTargetLabel: { en: "Paste into the week of", fr: "Coller dans la semaine du" },
+    copyWeekConfirm: { en: "Paste", fr: "Coller" },
+    copyWeekSameWeek: { en: "Choose a different week.", fr: "Choisis une autre semaine." },
+    copyWeekError: { en: "Something went wrong, please try again.", fr: "Une erreur est survenue, réessaie." },
+};

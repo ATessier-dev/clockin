@@ -1,0 +1,23 @@
+import type { Translation } from "./types";
+
+export const checklistTranslations: Record<string, Translation> = {
+    title: { en: "Checklist", fr: "Liste de tâches" },
+    addTask: { en: "Add a task", fr: "Ajouter une tâche" },
+    editTask: { en: "Edit", fr: "Modifier" },
+    deleteTask: { en: "Delete", fr: "Supprimer" },
+    labelLabel: { en: "Task", fr: "Tâche" },
+    recurrenceLabel: { en: "Repeats", fr: "Récurrence" },
+    recurrenceOneTime: { en: "One-time", fr: "Ponctuelle" },
+    recurrenceDaily: { en: "Daily", fr: "Quotidienne" },
+    recurrenceWeekly: { en: "Weekly", fr: "Hebdomadaire" },
+    recurrenceMonthly: { en: "Monthly", fr: "Mensuelle" },
+    cancel: { en: "Cancel", fr: "Annuler" },
+    save: { en: "Save", fr: "Enregistrer" },
+    saveError: { en: "Something went wrong, please try again.", fr: "Une erreur est survenue, réessaie." },
+    empty: { en: "No tasks yet", fr: "Aucune tâche pour le moment" },
+    checkedByPrefix: { en: "Checked by", fr: "Coché par" },
+    uncheckForbidden: {
+        en: "Only the person who checked this task (or a superuser) can uncheck it.",
+        fr: "Seule la personne qui a coché cette tâche (ou un superviseur) peut la décocher.",
+    },
+};

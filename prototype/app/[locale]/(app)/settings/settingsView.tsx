@@ -1,0 +1,192 @@
+"use client";
+
+import { useState, type FormEvent } from "react";
+import { UserCog, Check, Save, KeyRound } from "lucide-react";
+import { useRouter, usePathname } from "@/i18n/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { getTranslation, settingsTranslations, type Language } from "@/translations";
+
+export type SettingsEmployee = {
+  id: string;
+  code: string;
+  firstName: string;
+  lastName: string;
+  phone: string | null;
+  preferredWorkplaceId: string | null;
+  availabilityNote: string | null;
+  locale: Language;
+};
+
+export type WorkplaceOption = { id: string; label: string };
+
+export function SettingsView({
+  language,
+  employee,
+  workplaces,
+}: {
+  language: Language;
+  employee: SettingsEmployee;
+  workplaces: WorkplaceOption[];
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [firstName, setFirstName] = useState(employee.firstName);
+  const [lastName, setLastName] = useState(employee.lastName);
+  const [phone, setPhone] = useState(employee.phone ?? "");
+  const [preferredWorkplaceId, setPreferredWorkplaceId] = useState(employee.preferredWorkplaceId ?? "");
+  const [availabilityNote, setAvailabilityNote] = useState(employee.availabilityNote ?? "");
+  const [locale, setLocale] = useState<Language>(employee.locale);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    setSubmitting(true);
+    setError(false);
+    setSaved(false);
+
+    const response = await fetch(`/api/employees/${employee.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        firstName,
+        lastName,
+        phone: phone || null,
+        preferredWorkplaceId: preferredWorkplaceId || null,
+        availabilityNote: availabilityNote || null,
+        locale,
+      }),
+    });
+
+    setSubmitting(false);
+
+    if (!response.ok) {
+      setError(true);
+      return;
+    }
+
+    if (locale !== employee.locale) {
+      // Switch the active UI language by navigating to the same page under
+      // the new locale prefix — next-intl's router handles the redirect.
+      router.replace(pathname, { locale });
+      return;
+    }
+
+    setSaved(true);
+    router.refresh();
+  }
+
+  return (
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-sm">
+          <UserCog className="h-4 w-4 text-primary" aria-hidden="true" />
+          {getTranslation(settingsTranslations.title, language)}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="space-y-1">
+            <Label>{getTranslation(settingsTranslations.codeLabel, language)}</Label>
+            <p className="flex items-center gap-1.5 font-mono text-sm text-muted-foreground">
+              <KeyRound className="h-3.5 w-3.5" aria-hidden="true" />
+              {employee.code}
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="settings-first-name">
+              {getTranslation(settingsTranslations.firstNameLabel, language)}
+            </Label>
+            <Input
+              id="settings-first-name"
+              value={firstName}
+              onChange={(event) => setFirstName(event.target.value)}
+              required
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="settings-last-name">
+              {getTranslation(settingsTranslations.lastNameLabel, language)}
+            </Label>
+            <Input
+              id="settings-last-name"
+              value={lastName}
+              onChange={(event) => setLastName(event.target.value)}
+              required
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="settings-phone">{getTranslation(settingsTranslations.phoneLabel, language)}</Label>
+            <Input id="settings-phone" value={phone} onChange={(event) => setPhone(event.target.value)} />
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="settings-workplace">
+              {getTranslation(settingsTranslations.preferredWorkplaceLabel, language)}
+            </Label>
+            <select
+              id="settings-workplace"
+              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+              value={preferredWorkplaceId}
+              onChange={(event) => setPreferredWorkplaceId(event.target.value)}
+            >
+              <option value="">—</option>
+              {workplaces.map((workplace) => (
+                <option key={workplace.id} value={workplace.id}>
+                  {workplace.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="settings-note">
+              {getTranslation(settingsTranslations.availabilityNoteLabel, language)}
+            </Label>
+            <Input
+              id="settings-note"
+              value={availabilityNote}
+              onChange={(event) => setAvailabilityNote(event.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="settings-locale">{getTranslation(settingsTranslations.localeLabel, language)}</Label>
+            <select
+              id="settings-locale"
+              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+              value={locale}
+              onChange={(event) => setLocale(event.target.value as Language)}
+            >
+              <option value="fr">Français</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+
+          {error && (
+            <p className="text-xs text-destructive">{getTranslation(settingsTranslations.saveError, language)}</p>
+          )}
+          {saved && (
+            <p className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Check className="h-3.5 w-3.5" aria-hidden="true" />
+              {getTranslation(settingsTranslations.saved, language)}
+            </p>
+          )}
+
+          <Button type="submit" size="sm" disabled={submitting}>
+            <Save className="h-4 w-4" aria-hidden="true" />
+            {getTranslation(settingsTranslations.save, language)}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
