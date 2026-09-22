@@ -20,20 +20,31 @@ export async function POST(request: Request) {
     }
     const type = body.type;
 
+    // No longer gated on being on a workplace's network — clock in/out is
+    // allowed from anywhere. The workplace is still recorded when it can be
+    // inferred, so timesheets/reporting keep working: matched by IP first,
+    // falling back to the employee's preferred workplace.
     const ip = getClientIp(request);
     const workplaces = await withPrisma((prisma) =>
       prisma.workplace.findMany({ select: { id: true, allowedCidr: true } })
     );
-    const workplace = matchWorkplace(ip, workplaces);
+    const matchedWorkplace = matchWorkplace(ip, workplaces);
 
-    if (!workplace) {
-      return NextResponse.json({ error: "not_on_workplace_network" }, { status: 403 });
+    let workplaceId = matchedWorkplace?.id ?? null;
+    if (!workplaceId) {
+      const employee = await withPrisma((prisma) =>
+        prisma.employee.findUnique({
+          where: { id: session.employeeId },
+          select: { preferredWorkplaceId: true },
+        })
+      );
+      workplaceId = employee?.preferredWorkplaceId ?? null;
     }
 
     const clockEvent =
       type === "CLOCK_IN"
-        ? await recordClockIn({ employeeId: session.employeeId, workplaceId: workplace.id, ip })
-        : await recordClockOut({ employeeId: session.employeeId, workplaceId: workplace.id, ip });
+        ? await recordClockIn({ employeeId: session.employeeId, workplaceId, ip })
+        : await recordClockOut({ employeeId: session.employeeId, workplaceId, ip });
 
     return NextResponse.json({ clockEvent }, { status: 201 });
   } catch (error) {
