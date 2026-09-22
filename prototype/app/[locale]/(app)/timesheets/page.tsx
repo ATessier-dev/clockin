@@ -1,4 +1,4 @@
-import { startOfWeek, endOfWeek } from 'date-fns';
+import { startOfDay, endOfDay } from 'date-fns';
 import { getSession } from '@/lib/auth/session';
 import { withPrisma } from '@/lib/withPrisma';
 import { redirect } from '@/i18n/navigation';
@@ -9,10 +9,10 @@ import { ExpectedStatusCard, type ExpectedEmployee } from './expectedStatus';
 
 export default async function TimesheetsPage({ params, searchParams }: {
     params: Promise<{ locale: string }>;
-    searchParams: Promise<{ employeeId?: string; week?: string }>;
+    searchParams: Promise<{ employeeId?: string; day?: string }>;
 }) {
     const { locale } = await params;
-    const { employeeId, week } = await searchParams;
+    const { employeeId, day } = await searchParams;
     const language = (locale === "en" ? "en" : "fr") as Language;
 
     const sessionUser = await getSession();
@@ -91,17 +91,17 @@ export default async function TimesheetsPage({ params, searchParams }: {
 
     const selectedEmployeeId = employeeId ?? employees[0]?.id ?? "";
 
-    const requestedDate = week ? new Date(week) : new Date();
+    const requestedDate = day ? new Date(day) : new Date();
     const referenceDate = Number.isNaN(requestedDate.getTime()) ? new Date() : requestedDate;
-    const weekStart = startOfWeek(referenceDate, { weekStartsOn: 1 });
-    const weekEnd = endOfWeek(referenceDate, { weekStartsOn: 1 });
+    const dayStart = startOfDay(referenceDate);
+    const dayEnd = endOfDay(referenceDate);
 
     const clockEvents = selectedEmployeeId
         ? await withPrisma((prisma) =>
               prisma.clockEvent.findMany({
                   where: {
                       employeeId: selectedEmployeeId,
-                      at: { gte: weekStart, lte: weekEnd },
+                      at: { gte: dayStart, lte: dayEnd },
                   },
                   orderBy: { at: "asc" },
                   select: {
@@ -123,12 +123,12 @@ export default async function TimesheetsPage({ params, searchParams }: {
                 <ActiveStatusCard language={language} activeEmployees={activeEmployees} />
             </div>
             <TimesheetsView
-                key={`${selectedEmployeeId}-${weekStart.toISOString()}`}
+                key={`${selectedEmployeeId}-${dayStart.toISOString()}`}
                 language={language}
                 employees={employees}
                 workplaces={workplaces}
                 selectedEmployeeId={selectedEmployeeId}
-                weekStartIso={weekStart.toISOString()}
+                dayStartIso={dayStart.toISOString()}
                 entries={clockEvents}
             />
         </main>

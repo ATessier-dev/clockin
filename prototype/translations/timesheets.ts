@@ -20,4 +20,9 @@ export const timesheetsTranslations: Record<string, Translation> = {
     expectedStatusEmpty: { en: "No one is scheduled right now", fr: "Personne n'est prévu au poste en ce moment" },
     expectedStatusClockedIn: { en: "Clocked in", fr: "En poste" },
     expectedStatusNotClockedIn: { en: "Not clocked in", fr: "Pas encore en poste" },
+    previousDay: { en: "Previous day", fr: "Jour précédent" },
+    nextDay: { en: "Next day", fr: "Jour suivant" },
+    today: { en: "Today", fr: "Aujourd'hui" },
+    totalThisDay: { en: "Total this day", fr: "Total ce jour" },
+    noEventsThisDay: { en: "No clock-in/out this day", fr: "Aucun pointage ce jour" },
 };
