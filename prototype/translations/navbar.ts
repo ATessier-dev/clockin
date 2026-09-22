@@ -10,4 +10,5 @@ export const navbarTranslations: Record<string, Translation> = {
     timesheets: { en: "Timesheets", fr: "Feuilles de temps" },
     employees: { en: "Employees", fr: "Employés" },
     logout: { en: "Log out", fr: "Déconnexion" },
+    switchLanguage: { en: "Switch language", fr: "Changer de langue" },
 };
