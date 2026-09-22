@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { getTranslation, navbarTranslations, type Language } from "@/translations";
 import { withPrisma } from "@/lib/withPrisma";
 import { LogoutButton } from "./logoutButton";
+import { LanguageSwitcher } from "./languageSwitcher";
 import { NavLink } from "./navLink";
 
 const navItems = [
@@ -66,6 +67,7 @@ export default async function Navbar() {
                 <Badge variant={sessionUser.role === "SUPERUSER" ? "default" : "secondary"}>
                     {sessionUser.role}
                 </Badge>
+                <LanguageSwitcher language={language} />
                 <LogoutButton language={language} />
 
                 <div className="sm:hidden">
