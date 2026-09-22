@@ -8,6 +8,7 @@ export * from "./employees";
 export * from "./settings";
 export * from "./workplaces";
 export * from "./checklist";
+export * from "./availability";
 export type { Language, Translation } from "./types";
 import type { Language, Translation } from "./types";
 

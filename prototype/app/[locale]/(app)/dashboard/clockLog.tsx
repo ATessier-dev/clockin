@@ -112,7 +112,9 @@ export function ClockLog({
                   {dayMinutes !== undefined && <span>{formatDuration(dayMinutes)}</span>}
                 </p>
                 {group.entries.map((entry) => (
-                  <div key={entry.id} className="flex items-center justify-between gap-3 text-sm">
+                  // Type + time on one line, workplace on the next — fitting
+                  // all three on a single line overflows on narrow phones.
+                  <div key={entry.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 text-sm">
                     <span className="flex items-center gap-1.5 font-medium">
                       {entry.type === "CLOCK_IN" ? (
                         <LogIn className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
@@ -128,7 +130,7 @@ export function ClockLog({
                       {format(entry.at, "HH:mm", { locale: dateLocale })}
                     </span>
                     {entry.workplace && (
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <span className="flex w-full items-center gap-1 text-xs text-muted-foreground">
                         <span
                           className="h-2 w-2 shrink-0 rounded-full"
                           style={{ backgroundColor: entry.workplace.color }}

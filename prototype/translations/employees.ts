@@ -15,7 +15,7 @@ export const employeesTranslations: Record<string, Translation> = {
     roleSuperuser: { en: "Manager", fr: "Superviseur" },
     phoneLabel: { en: "Phone", fr: "Téléphone" },
     preferredWorkplaceLabel: { en: "Preferred workplace", fr: "Lieu préféré" },
-    availabilityNoteLabel: { en: "Availability note", fr: "Disponibilités" },
+    availabilityNoteLabel: { en: "Additional note", fr: "Note additionnelle" },
     cancel: { en: "Cancel", fr: "Annuler" },
     save: { en: "Save", fr: "Enregistrer" },
     saveError: { en: "Something went wrong, please try again.", fr: "Une erreur est survenue, réessaie." },

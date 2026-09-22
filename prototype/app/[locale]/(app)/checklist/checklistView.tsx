@@ -132,7 +132,7 @@ export function ChecklistView({
                     )}
                   </span>
                   {isSuperuser && (
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setFormMode(item)}>
+                    <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setFormMode(item)}>
                       <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                       <span className="sr-only">
                         {getTranslation(checklistTranslations.editTask, language)}
