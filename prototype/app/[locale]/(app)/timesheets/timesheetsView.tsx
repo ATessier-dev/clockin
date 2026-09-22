@@ -150,42 +150,50 @@ export function TimesheetsView({
             {getTranslation(timesheetsTranslations.totalThisDay, language)}: {formatDuration(totalMinutes)}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-1">
+        <CardContent className="space-y-3">
           {entries.length === 0 ? (
             <p className="text-xs text-muted-foreground">
               {getTranslation(timesheetsTranslations.noEventsThisDay, language)}
             </p>
           ) : (
             entries.map((entry) => (
-              <div key={entry.id} className="flex items-center justify-between gap-2 text-sm">
-                <span className="flex items-center gap-1.5 font-medium">
-                  {entry.type === "CLOCK_IN" ? (
-                    <LogIn className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
-                  ) : (
-                    <LogOut className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
-                  )}
-                  {getTranslation(
-                    entry.type === "CLOCK_IN" ? clockTranslations.clockIn : clockTranslations.clockOut,
-                    language
-                  )}
-                </span>
-                <span className="text-muted-foreground">
-                  {format(entry.at, "HH:mm", { locale: dateLocale })}
-                </span>
-                {entry.workplace && (
-                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <span
-                      className="h-2 w-2 shrink-0 rounded-full"
-                      style={{ backgroundColor: entry.workplace.color }}
-                      aria-hidden="true"
-                    />
-                    {entry.workplace.label}
+              // Two rows, not one — cramming type + time + workplace + the edit
+              // button onto a single line overflows on narrow phone widths.
+              <div key={entry.id} className="space-y-1 text-sm">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5 font-medium">
+                    {entry.type === "CLOCK_IN" ? (
+                      <LogIn className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                    ) : (
+                      <LogOut className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
+                    )}
+                    {getTranslation(
+                      entry.type === "CLOCK_IN" ? clockTranslations.clockIn : clockTranslations.clockOut,
+                      language
+                    )}
                   </span>
-                )}
-                <Button variant="outline" size="sm" onClick={() => setFormMode(entry)}>
-                  <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                  {getTranslation(timesheetsTranslations.editEvent, language)}
-                </Button>
+                  <span className="text-muted-foreground">
+                    {format(entry.at, "HH:mm", { locale: dateLocale })}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  {entry.workplace ? (
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <span
+                        className="h-2 w-2 shrink-0 rounded-full"
+                        style={{ backgroundColor: entry.workplace.color }}
+                        aria-hidden="true"
+                      />
+                      {entry.workplace.label}
+                    </span>
+                  ) : (
+                    <span />
+                  )}
+                  <Button variant="outline" size="sm" onClick={() => setFormMode(entry)}>
+                    <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                    {getTranslation(timesheetsTranslations.editEvent, language)}
+                  </Button>
+                </div>
               </div>
             ))
           )}

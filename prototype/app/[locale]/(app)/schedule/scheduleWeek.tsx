@@ -328,9 +328,8 @@ export function ScheduleWeek({
                 ref={isToday ? todayCardRef : undefined}
                 className={isToday ? "w-full border-primary/50 shadow-md" : "w-full"}
               >
-                <CardHeader className="flex-row items-center justify-between space-y-0 text-center">
-                  <span className="w-7" aria-hidden="true" />
-                  <CardTitle className="flex items-center gap-2 text-sm capitalize">
+                <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
+                  <CardTitle className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm capitalize">
                     {format(day, "EEEE d MMM", { locale: dateLocale })}
                     {isToday && (
                       <Badge variant="default" className="normal-case">
@@ -338,18 +337,16 @@ export function ScheduleWeek({
                       </Badge>
                     )}
                   </CardTitle>
-                  {isSuperuser ? (
+                  {isSuperuser && (
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7"
+                      className="h-9 w-9 shrink-0"
                       onClick={() => handleAddForDay(day)}
                       aria-label={getTranslation(scheduleCalendarTranslations.addShift, language)}
                     >
                       <Plus className="h-4 w-4" aria-hidden="true" />
                     </Button>
-                  ) : (
-                    <span className="w-7" aria-hidden="true" />
                   )}
                 </CardHeader>
                 <CardContent className="flex flex-col items-center gap-2 text-center">
