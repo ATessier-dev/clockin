@@ -3,6 +3,7 @@ import { withPrisma } from '@/lib/withPrisma';
 import { type Language } from '@/translations';
 import { SettingsView } from './settingsView';
 import { WorkplacesManager } from './workplacesManager';
+import { AvailabilityEditor } from './availabilityEditor';
 
 export default async function SettingsPage({ params }: {
     params: Promise<{ locale: string }>;
@@ -31,7 +32,14 @@ export default async function SettingsPage({ params }: {
     );
 
     const workplaces = await withPrisma((prisma) =>
-        prisma.workplace.findMany({ orderBy: { label: "asc" }, select: { id: true, label: true } })
+        prisma.workplace.findMany({ orderBy: { label: "asc" }, select: { id: true, label: true, color: true } })
+    );
+
+    const availabilities = await withPrisma((prisma) =>
+        prisma.employeeAvailability.findMany({
+            where: { employeeId: sessionUser.employeeId },
+            select: { dayOfWeek: true, workplaceId: true },
+        })
     );
 
     const allWorkplaces = isSuperuser
@@ -49,6 +57,12 @@ export default async function SettingsPage({ params }: {
                 language={language}
                 employee={{ ...employee, locale: employee.locale === "en" ? "en" : "fr" }}
                 workplaces={workplaces}
+            />
+            <AvailabilityEditor
+                language={language}
+                employeeId={sessionUser.employeeId}
+                workplaces={workplaces}
+                initialAvailabilities={availabilities}
             />
             {isSuperuser && <WorkplacesManager language={language} workplaces={allWorkplaces} />}
         </main>

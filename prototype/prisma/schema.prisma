@@ -38,6 +38,16 @@ enum ChecklistRecurrence {
   MONTHLY
 }
 
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
 /// Users and employees are the same entity (per ideas.md) — every account
 /// that can log in is an Employee, distinguished only by `role`.
 model Employee {
@@ -65,6 +75,7 @@ model Employee {
   clockEvents         ClockEvent[]  @relation("EmployeeClockEvents")
   editedClockEvents   ClockEvent[]  @relation("EditedByEmployee")
   completedChecklistItems ChecklistItem[] @relation("ChecklistCompletedBy")
+  availabilities      EmployeeAvailability[]
 
   @@map("employees")
 }
@@ -86,8 +97,28 @@ model Workplace {
   preferredByEmployees Employee[]   @relation("EmployeePreferredWorkplace")
   shifts               Shift[]
   clockEvents          ClockEvent[]
+  availabilities       EmployeeAvailability[]
 
   @@map("workplaces")
+}
+
+/// A day/workplace pair an employee has marked themselves available for,
+/// self-edited from their own /settings page (e.g. "Tuesday at Mont-Royal
+/// and/or Saint-Paul"). A preference signal only — it doesn't create or
+/// constrain Shift rows, which the superuser still assigns by hand on
+/// /schedule.
+model EmployeeAvailability {
+  id          String    @id @default(cuid())
+  employeeId  String    @map("employee_id")
+  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  dayOfWeek   DayOfWeek @map("day_of_week")
+  workplaceId String    @map("workplace_id")
+  workplace   Workplace @relation(fields: [workplaceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@unique([employeeId, dayOfWeek, workplaceId])
+  @@index([employeeId])
+  @@map("employee_availabilities")
 }
 
 /// A planned work period. Combined start/end DateTime (not a separate

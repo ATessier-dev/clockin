@@ -7,7 +7,7 @@ export const settingsTranslations: Record<string, Translation> = {
     lastNameLabel: { en: "Last name", fr: "Nom" },
     phoneLabel: { en: "Phone", fr: "Téléphone" },
     preferredWorkplaceLabel: { en: "Preferred workplace", fr: "Lieu préféré" },
-    availabilityNoteLabel: { en: "Availability note", fr: "Disponibilités" },
+    availabilityNoteLabel: { en: "Additional note", fr: "Note additionnelle" },
     localeLabel: { en: "Language", fr: "Langue" },
     save: { en: "Save", fr: "Enregistrer" },
     saved: { en: "Changes saved.", fr: "Modifications enregistrées." },
