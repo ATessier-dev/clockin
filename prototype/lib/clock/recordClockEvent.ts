@@ -25,7 +25,7 @@ export async function getLatestClockEvent(employeeId: string) {
   );
 }
 
-export async function recordClockIn(params: { employeeId: string; workplaceId: string; ip: string }) {
+export async function recordClockIn(params: { employeeId: string; workplaceId: string | null; ip: string }) {
   const latest = await getLatestClockEvent(params.employeeId);
   if (latest?.type === "CLOCK_IN") {
     throw new OpenClockEventConflictError();
@@ -44,7 +44,7 @@ export async function recordClockIn(params: { employeeId: string; workplaceId: s
   );
 }
 
-export async function recordClockOut(params: { employeeId: string; workplaceId: string; ip: string }) {
+export async function recordClockOut(params: { employeeId: string; workplaceId: string | null; ip: string }) {
   const latest = await getLatestClockEvent(params.employeeId);
   if (latest?.type !== "CLOCK_IN") {
     throw new NoOpenClockEventError();

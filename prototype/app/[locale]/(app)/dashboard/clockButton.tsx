@@ -36,12 +36,7 @@ export function ClockButton({
     setLoading(false);
 
     if (!response.ok) {
-      const data = (await response.json().catch(() => null)) as { error?: string } | null;
-      setError(
-        data?.error === "not_on_workplace_network"
-          ? getTranslation(clockTranslations.notOnWorkplaceNetwork, language)
-          : getTranslation(clockTranslations.genericError, language)
-      );
+      setError(getTranslation(clockTranslations.genericError, language));
       return;
     }
 
