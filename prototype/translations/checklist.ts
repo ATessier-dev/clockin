@@ -20,4 +20,11 @@ export const checklistTranslations: Record<string, Translation> = {
         en: "Only the person who checked this task (or a superuser) can uncheck it.",
         fr: "Seule la personne qui a coché cette tâche (ou un superviseur) peut la décocher.",
     },
+    addCategory: { en: "Add a category", fr: "Ajouter une catégorie" },
+    editCategory: { en: "Edit category", fr: "Modifier la catégorie" },
+    deleteCategory: { en: "Delete category", fr: "Supprimer la catégorie" },
+    categoryNameLabel: { en: "Category name", fr: "Nom de la catégorie" },
+    uncategorized: { en: "Uncategorized", fr: "Sans catégorie" },
+    categoryLabel: { en: "Category", fr: "Catégorie" },
+    noCategoryOption: { en: "No category", fr: "Aucune catégorie" },
 };

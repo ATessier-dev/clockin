@@ -185,6 +185,22 @@ model Link {
   @@map("links")
 }
 
+/// Groups ChecklistItems for display (one card per category on the
+/// /checklist page). Only a superuser can create/rename/delete categories.
+/// Deleting a category never deletes its items — they just fall back to
+/// "uncategorized" (see ChecklistItem.categoryId's onDelete: SetNull).
+model ChecklistCategory {
+  id        String          @id @default(cuid())
+  name      String
+  sortOrder Int             @default(0) @map("sort_order")
+  createdAt DateTime        @default(now()) @map("created_at")
+  updatedAt DateTime        @updatedAt @map("updated_at")
+
+  items     ChecklistItem[]
+
+  @@map("checklist_categories")
+}
+
 /// Shared team checklist — not in the original plan, added on request. Any
 /// employee can check an item; only the employee who checked it, or a
 /// superuser, can uncheck it. Only a superuser can add, edit, or delete
@@ -202,9 +218,12 @@ model ChecklistItem {
   completedAt         DateTime?           @map("completed_at")
   completedByEmployeeId String?           @map("completed_by_employee_id")
   completedByEmployee Employee?           @relation("ChecklistCompletedBy", fields: [completedByEmployeeId], references: [id])
+  categoryId          String?             @map("category_id")
+  category            ChecklistCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   sortOrder           Int                 @default(0) @map("sort_order")
   createdAt           DateTime            @default(now()) @map("created_at")
   updatedAt           DateTime            @updatedAt @map("updated_at")
 
+  @@index([categoryId])
   @@map("checklist_items")
 }
