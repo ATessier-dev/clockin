@@ -103,7 +103,8 @@ model Workplace {
 }
 
 /// A job position/role an employee can be scheduled for (e.g. "Galeriste").
-/// Superuser-managed catalog — just a name + color badge for now.
+/// Superuser-managed catalog. Only a name and a color badge for now; not
+/// yet linked to Shift or Employee.
 model Position {
   id        String   @id @default(cuid())
   name      String
@@ -201,9 +202,10 @@ model Link {
 }
 
 /// Groups ChecklistItems for display (one card per category on the
-/// /checklist page). Only a superuser can create/rename/delete categories.
-/// Deleting a category never deletes its items — they just fall back to
-/// "uncategorized" (see ChecklistItem.categoryId's onDelete: SetNull).
+/// /checklist page). Only a superuser can create, rename, or delete
+/// categories. Deleting a category never deletes its items; they simply
+/// fall back to "uncategorized" (see ChecklistItem.categoryId's
+/// onDelete: SetNull).
 model ChecklistCategory {
   id        String          @id @default(cuid())
   name      String
@@ -233,6 +235,7 @@ model ChecklistItem {
   completedAt         DateTime?           @map("completed_at")
   completedByEmployeeId String?           @map("completed_by_employee_id")
   completedByEmployee Employee?           @relation("ChecklistCompletedBy", fields: [completedByEmployeeId], references: [id])
+  /// Optional. Null means the item is shown in the "uncategorized" group.
   categoryId          String?             @map("category_id")
   category            ChecklistCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   sortOrder           Int                 @default(0) @map("sort_order")
