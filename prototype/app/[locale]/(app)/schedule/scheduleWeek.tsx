@@ -13,6 +13,7 @@ import {
   Pencil,
   CalendarCheck,
   Copy,
+  PartyPopper,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageHeading } from "@/components/ui/pageHeading";
-import { getTranslation, scheduleCalendarTranslations, type Language } from "@/translations";
+import { getTranslation, scheduleCalendarTranslations, eventsTranslations, type Language } from "@/translations";
 import { ShiftDisplay, type ShiftListItem } from "./shiftDisplay";
 import {
   ShiftForm,
@@ -31,6 +32,8 @@ import {
 } from "./editSchedule";
 import { dateLocales } from "./clockDisplay";
 import { TeamAvailabilityPanel, type TeamAvailabilityEntry } from "./teamAvailability";
+import { DayExtras, type DailyMeetingDisplay } from "./dayExtras";
+import { GalleryEventForm, galleryEventToFormDefaults, type GalleryEventEntry } from "./editGalleryEvent";
 
 type RawShift = {
   id: string;
@@ -69,6 +72,8 @@ export function ScheduleWeek({
   workplaces,
   positions,
   teamAvailabilities,
+  dailyMeetings,
+  events,
 }: {
   language: Language;
   weekDays: Date[];
@@ -80,6 +85,8 @@ export function ScheduleWeek({
   workplaces: WorkplaceOption[];
   positions: PositionOption[];
   teamAvailabilities: TeamAvailabilityEntry[];
+  dailyMeetings: DailyMeetingDisplay[];
+  events: GalleryEventEntry[];
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -92,6 +99,7 @@ export function ScheduleWeek({
   const [copyTargetDate, setCopyTargetDate] = useState("");
   const [copying, setCopying] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
+  const [eventFormMode, setEventFormMode] = useState<"create" | GalleryEventEntry | null>(null);
 
   const dateLocale = dateLocales[language];
   const shiftsToShow = showAll ? (allShifts ?? []) : myShifts;
@@ -207,6 +215,11 @@ export function ScheduleWeek({
     }
   }
 
+  function handleEventChanged() {
+    setEventFormMode(null);
+    router.refresh();
+  }
+
   return (
     <div className="mx-auto w-full max-w-6xl">
       <div
@@ -304,8 +317,25 @@ export function ScheduleWeek({
                   {getTranslation(scheduleCalendarTranslations.copyWeek, language)}
                 </Button>
               )}
+              {isSuperuser && (
+                <Button variant="outline" size="sm" onClick={() => setEventFormMode("create")}>
+                  <PartyPopper className="h-4 w-4" aria-hidden="true" />
+                  {getTranslation(eventsTranslations.addEvent, language)}
+                </Button>
+              )}
             </div>
           </div>
+
+          {isSuperuser && eventFormMode && (
+            <GalleryEventForm
+              language={language}
+              workplaces={workplaces}
+              initialValues={eventFormMode === "create" ? undefined : galleryEventToFormDefaults(eventFormMode)}
+              onCancel={() => setEventFormMode(null)}
+              onSaved={handleEventChanged}
+              onDeleted={handleEventChanged}
+            />
+          )}
 
           {isSuperuser && copyMode && (
             <form
@@ -407,6 +437,14 @@ export function ScheduleWeek({
                       )}
                     </CardHeader>
                     <CardContent className="flex flex-col items-center gap-2 text-center">
+                      <DayExtras
+                        language={language}
+                        day={day}
+                        dailyMeetings={dailyMeetings}
+                        events={events}
+                        isSuperuser={isSuperuser}
+                        onEditEvent={(event) => setEventFormMode(event)}
+                      />
                       {dayShifts.length > 0 ? (
                         <ShiftDisplay
                           shiftList={dayShifts}

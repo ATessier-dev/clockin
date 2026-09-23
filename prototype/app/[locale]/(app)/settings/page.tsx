@@ -4,6 +4,7 @@ import { redirect } from '@/i18n/navigation';
 import { type Language } from '@/translations';
 import { WorkplacesManager } from './workplacesManager';
 import { PositionsManager } from './positionsManager';
+import { DailyMeetingsManager } from './dailyMeetingsManager';
 
 export default async function SettingsPage({ params }: {
     params: Promise<{ locale: string }>;
@@ -17,7 +18,7 @@ export default async function SettingsPage({ params }: {
         redirect({ href: "/dashboard", locale });
     }
 
-    const [workplaces, positions] = await Promise.all([
+    const [workplaces, positions, dailyMeetings] = await Promise.all([
         withPrisma((prisma) =>
             prisma.workplace.findMany({
                 orderBy: { label: "asc" },
@@ -30,12 +31,30 @@ export default async function SettingsPage({ params }: {
                 select: { id: true, name: true, color: true },
             })
         ),
+        withPrisma((prisma) =>
+            prisma.dailyMeeting.findMany({
+                orderBy: [{ time: "asc" }, { sortOrder: "asc" }],
+                select: {
+                    id: true,
+                    name: true,
+                    time: true,
+                    days: true,
+                    workplaceId: true,
+                    workplace: { select: { label: true, color: true } },
+                },
+            })
+        ),
     ]);
 
     return (
         <main className="flex flex-col items-center gap-6 p-4">
             <WorkplacesManager language={language} workplaces={workplaces} />
             <PositionsManager language={language} positions={positions} />
+            <DailyMeetingsManager
+                language={language}
+                dailyMeetings={dailyMeetings}
+                workplaces={workplaces.map((workplace) => ({ id: workplace.id, label: workplace.label }))}
+            />
         </main>
     );
 }

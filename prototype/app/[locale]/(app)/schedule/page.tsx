@@ -72,6 +72,37 @@ export default async function SchedulePage({params, searchParams} : {
           ])
         : [[], [], [], []];
 
+    // Shown to every employee, not just the superuser who manages them.
+    const [dailyMeetings, events] = await Promise.all([
+        withPrisma((prisma) =>
+            prisma.dailyMeeting.findMany({
+                orderBy: [{ time: "asc" }, { sortOrder: "asc" }],
+                select: {
+                    id: true,
+                    name: true,
+                    time: true,
+                    days: true,
+                    workplace: { select: { label: true, color: true } },
+                },
+            })
+        ),
+        withPrisma((prisma) =>
+            prisma.galleryEvent.findMany({
+                where: { startAt: { lte: weekEnd }, endAt: { gte: weekStart } },
+                orderBy: { startAt: "asc" },
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    startAt: true,
+                    endAt: true,
+                    workplaceId: true,
+                    workplace: { select: { label: true, color: true } },
+                },
+            })
+        ),
+    ]);
+
     return (
         <main className="p-4">
             <ScheduleWeek
@@ -86,6 +117,8 @@ export default async function SchedulePage({params, searchParams} : {
                 workplaces={workplaces}
                 positions={positions}
                 teamAvailabilities={teamAvailabilities}
+                dailyMeetings={dailyMeetings}
+                events={events}
             />
         </main>
     )

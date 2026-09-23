@@ -101,8 +101,49 @@ model Workplace {
   shifts               Shift[]
   clockEvents          ClockEvent[]
   availabilities       EmployeeAvailability[]
+  dailyMeetings        DailyMeeting[]
+  galleryEvents        GalleryEvent[]
 
   @@map("workplaces")
+}
+
+/// A recurring meeting (e.g. "Stand-up") shown on the schedule for each day
+/// of the week it repeats on. Superuser-managed.
+model DailyMeeting {
+  id          String      @id @default(cuid())
+  name        String
+  /// 24h "HH:mm" time of day, e.g. "09:00".
+  time        String
+  /// Days of the week this meeting repeats on (e.g. [MONDAY, TUESDAY]).
+  /// Never empty; enforced at the API level, not the database.
+  days        DayOfWeek[]
+  workplaceId String      @map("workplace_id")
+  workplace   Workplace   @relation(fields: [workplaceId], references: [id])
+  sortOrder   Int         @default(0) @map("sort_order")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  @@index([workplaceId])
+  @@map("daily_meetings")
+}
+
+/// A one-off event happening at a workplace (e.g. an opening, a private
+/// viewing), shown on the schedule for the days it spans. Superuser-managed.
+model GalleryEvent {
+  id          String     @id @default(cuid())
+  title       String
+  description String?    @db.Text
+  startAt     DateTime   @map("start_at")
+  endAt       DateTime   @map("end_at")
+  /// Optional: an event isn't always tied to one specific workplace.
+  workplaceId String?    @map("workplace_id")
+  workplace   Workplace? @relation(fields: [workplaceId], references: [id], onDelete: SetNull)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  @@index([startAt])
+  @@index([workplaceId])
+  @@map("gallery_events")
 }
 
 /// A job position/role an employee can be scheduled for (e.g. "Galeriste").

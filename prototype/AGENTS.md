@@ -139,7 +139,16 @@ seulement à Prisma.
   `.next/types/` au lieu de `.next/dev/types/` (utilisé par
   `next dev`). C'est un fichier auto-généré qu'il ne faut pas commiter
   dans cet état — `git checkout -- next-env.d.ts` après coup ; `next
-  dev` le régénère correctement tout seul.
+  dev` le régénère correctement tout seul. En pratique : lancer
+  `next typegen`, garder `next-env.d.ts` tel quel le temps de lancer
+  `tsc --noEmit`, puis seulement après le restaurer avec
+  `git checkout -- next-env.d.ts` avant de terminer.
+- **`tsc --noEmit` échoue sur une route dynamique tout juste ajoutée**
+  (`Type '"/api/.../[id]"' does not satisfy the constraint
+  'AppRouteHandlerRoutes'`) même après un `next typegen` qui liste
+  bien la route dans `.next/types/routes.d.ts` : le cache incrémental
+  `tsconfig.tsbuildinfo` est périmé. Supprimer le fichier
+  (`rm -f tsconfig.tsbuildinfo`) et relancer `tsc --noEmit`.
 - **`npm run db:seed` ne charge pas `.env.local`** lui-même
   (contrairement à `prisma db push`, qui passe par `prisma.config.ts`).
   Sourcer les variables avant de l'appeler :

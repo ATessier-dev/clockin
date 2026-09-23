@@ -11,6 +11,8 @@ export * from "./checklist";
 export * from "./availability";
 export * from "./profile";
 export * from "./doc";
+export * from "./dailyMeetings";
+export * from "./events";
 export type { Language, Translation } from "./types";
 import type { Language, Translation } from "./types";
 
