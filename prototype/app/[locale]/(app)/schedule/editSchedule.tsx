@@ -10,7 +10,7 @@ import { getTranslation, scheduleCalendarTranslations, type Language } from "@/t
 import type { ShiftListItem } from "./shiftDisplay";
 
 export type EmployeeOption = { id: string; firstName: string; lastName: string };
-export type WorkplaceOption = { id: string; label: string };
+export type WorkplaceOption = { id: string; label: string; color: string };
 
 const DATETIME_LOCAL_FORMAT = "yyyy-MM-dd'T'HH:mm";
 
