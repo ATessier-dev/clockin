@@ -258,15 +258,16 @@ model DocCategory {
 /// A single documentation link on the /doc page. Superuser-managed, like
 /// the checklist and its categories.
 model DocLink {
-  id         String       @id @default(cuid())
-  title      String
-  url        String       @db.VarChar(500)
+  id          String       @id @default(cuid())
+  title       String
+  url         String       @db.VarChar(500)
+  description String?      @db.Text
   /// Optional. Null means the link is shown in the "uncategorized" group.
-  categoryId String?      @map("category_id")
-  category   DocCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  sortOrder  Int          @default(0) @map("sort_order")
-  createdAt  DateTime     @default(now()) @map("created_at")
-  updatedAt  DateTime     @updatedAt @map("updated_at")
+  categoryId  String?      @map("category_id")
+  category    DocCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  sortOrder   Int          @default(0) @map("sort_order")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
 
   @@index([categoryId])
   @@map("doc_links")

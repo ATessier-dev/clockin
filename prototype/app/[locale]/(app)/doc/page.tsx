@@ -17,7 +17,7 @@ export default async function DocPage({ params }: {
         withPrisma((prisma) =>
             prisma.docLink.findMany({
                 orderBy: { sortOrder: "asc" },
-                select: { id: true, title: true, url: true, categoryId: true },
+                select: { id: true, title: true, url: true, description: true, categoryId: true },
             })
         ),
     ]);

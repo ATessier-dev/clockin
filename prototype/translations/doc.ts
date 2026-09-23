@@ -12,6 +12,7 @@ export const docTranslations: Record<string, Translation> = {
     deleteLink: { en: "Delete", fr: "Supprimer" },
     titleLabel: { en: "Title", fr: "Titre" },
     urlLabel: { en: "URL", fr: "URL" },
+    descriptionLabel: { en: "Description", fr: "Description" },
     categoryLabel: { en: "Category", fr: "Catégorie" },
     noCategoryOption: { en: "No category", fr: "Aucune catégorie" },
     cancel: { en: "Cancel", fr: "Annuler" },
