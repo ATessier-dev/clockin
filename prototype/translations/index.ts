@@ -10,6 +10,7 @@ export * from "./positions";
 export * from "./checklist";
 export * from "./availability";
 export * from "./profile";
+export * from "./doc";
 export type { Language, Translation } from "./types";
 import type { Language, Translation } from "./types";
 
