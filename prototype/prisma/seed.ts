@@ -32,6 +32,11 @@ async function main() {
     },
   });
 
+  const existingGalleristePosition = await prisma.position.findFirst({ where: { name: "Galeriste" } });
+  if (!existingGalleristePosition) {
+    await prisma.position.create({ data: { name: "Galeriste", color: "#0ea5e9", sortOrder: 0 } });
+  }
+
   // Login looks the employee up by `code` directly (findUnique), so the
   // hash must be of that same value — not a separate secret. See the plan's
   // auth design: POST /api/auth/login { code } → findUnique({ code }) →
