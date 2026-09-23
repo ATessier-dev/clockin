@@ -13,19 +13,23 @@ export default async function ChecklistPage({ params }: {
     const sessionUser = await getSession();
     if (!sessionUser) return null;
 
-    const items = await withPrisma((prisma) =>
-        prisma.checklistItem.findMany({
-            orderBy: { sortOrder: "asc" },
-            select: {
-                id: true,
-                label: true,
-                recurrence: true,
-                completed: true,
-                completedAt: true,
-                completedByEmployee: { select: { id: true, firstName: true, lastName: true } },
-            },
-        })
-    );
+    const [items, categories] = await Promise.all([
+        withPrisma((prisma) =>
+            prisma.checklistItem.findMany({
+                orderBy: { sortOrder: "asc" },
+                select: {
+                    id: true,
+                    label: true,
+                    recurrence: true,
+                    completed: true,
+                    completedAt: true,
+                    categoryId: true,
+                    completedByEmployee: { select: { id: true, firstName: true, lastName: true } },
+                },
+            })
+        ),
+        withPrisma((prisma) => prisma.checklistCategory.findMany({ orderBy: { sortOrder: "asc" } })),
+    ]);
 
     return (
         <main className="p-4">
@@ -33,6 +37,7 @@ export default async function ChecklistPage({ params }: {
                 language={language}
                 isSuperuser={sessionUser.role === "SUPERUSER"}
                 currentEmployeeId={sessionUser.employeeId}
+                categories={categories.map((category) => ({ id: category.id, name: category.name }))}
                 items={items.map((item) => {
                     const completed = isEffectivelyCompleted(item.recurrence, item.completed, item.completedAt);
                     return {
@@ -40,6 +45,7 @@ export default async function ChecklistPage({ params }: {
                         label: item.label,
                         recurrence: item.recurrence,
                         completed,
+                        categoryId: item.categoryId,
                         completedByEmployee: completed ? item.completedByEmployee : null,
                     };
                 })}

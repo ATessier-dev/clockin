@@ -2,33 +2,60 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, ListChecks, Repeat, User } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Plus, Pencil, ListChecks, Repeat, User, FolderPlus } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PageHeading } from "@/components/ui/pageHeading";
 import { getTranslation, checklistTranslations, type Language } from "@/translations";
-import { ChecklistItemForm, RECURRENCE_TRANSLATION_KEY, type ChecklistItemEntry } from "./editChecklistItem";
+import {
+  ChecklistItemForm,
+  RECURRENCE_TRANSLATION_KEY,
+  type ChecklistItemEntry,
+  type ChecklistCategoryEntry,
+} from "./editChecklistItem";
+import { ChecklistCategoryForm } from "./editChecklistCategory";
 import { cn } from "@/lib/utils";
+
+type ItemFormMode = "create" | ChecklistItemEntry | null;
+type CategoryFormMode = "create" | ChecklistCategoryEntry | null;
 
 export function ChecklistView({
   language,
   isSuperuser,
   currentEmployeeId,
+  categories,
   items,
 }: {
   language: Language;
   isSuperuser: boolean;
   currentEmployeeId: string;
+  categories: ChecklistCategoryEntry[];
   items: ChecklistItemEntry[];
 }) {
   const router = useRouter();
-  const [formMode, setFormMode] = useState<"create" | ChecklistItemEntry | null>(null);
+  const [itemFormMode, setItemFormMode] = useState<ItemFormMode>(null);
+  const [categoryFormMode, setCategoryFormMode] = useState<CategoryFormMode>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [toggleError, setToggleError] = useState<string | null>(null);
 
-  function handleSaved() {
-    setFormMode(null);
+  function openItemForm(mode: ItemFormMode) {
+    setCategoryFormMode(null);
+    setItemFormMode(mode);
+  }
+
+  function openCategoryForm(mode: CategoryFormMode) {
+    setItemFormMode(null);
+    setCategoryFormMode(mode);
+  }
+
+  function handleItemSaved() {
+    setItemFormMode(null);
+    router.refresh();
+  }
+
+  function handleCategorySaved() {
+    setCategoryFormMode(null);
     router.refresh();
   }
 
@@ -54,6 +81,60 @@ export function ChecklistView({
     router.refresh();
   }
 
+  function renderItemRow(item: ChecklistItemEntry) {
+    const canUncheck = isSuperuser || item.completedByEmployee?.id === currentEmployeeId;
+    const checkboxDisabled = togglingId === item.id || (item.completed && !canUncheck);
+    return (
+      <div key={item.id} className="flex items-center gap-3 py-1.5">
+        <input
+          type="checkbox"
+          checked={item.completed}
+          onChange={() => handleToggle(item)}
+          disabled={checkboxDisabled}
+          className="h-4 w-4 shrink-0 cursor-pointer rounded border-input accent-primary disabled:cursor-not-allowed disabled:opacity-60"
+          aria-label={item.label}
+          title={
+            item.completed && !canUncheck
+              ? getTranslation(checklistTranslations.uncheckForbidden, language)
+              : undefined
+          }
+        />
+        <span className="flex flex-1 flex-col">
+          <span
+            className={cn(
+              "flex items-center gap-2 text-sm",
+              item.completed && "text-muted-foreground line-through"
+            )}
+          >
+            {item.label}
+            {item.recurrence !== "ONE_TIME" && (
+              <Badge variant="outline" className="gap-1 font-normal no-underline">
+                <Repeat className="h-3 w-3" aria-hidden="true" />
+                {getTranslation(checklistTranslations[RECURRENCE_TRANSLATION_KEY[item.recurrence]], language)}
+              </Badge>
+            )}
+          </span>
+          {item.completed && item.completedByEmployee && (
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <User className="h-3 w-3" aria-hidden="true" />
+              {getTranslation(checklistTranslations.checkedByPrefix, language)}{" "}
+              {item.completedByEmployee.firstName} {item.completedByEmployee.lastName}
+            </span>
+          )}
+        </span>
+        {isSuperuser && (
+          <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => openItemForm(item)}>
+            <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="sr-only">{getTranslation(checklistTranslations.editTask, language)}</span>
+          </Button>
+        )}
+      </div>
+    );
+  }
+
+  const categoryIds = new Set(categories.map((category) => category.id));
+  const uncategorizedItems = items.filter((item) => !item.categoryId || !categoryIds.has(item.categoryId));
+
   return (
     <div className="mx-auto flex w-full max-w-md flex-col items-center space-y-4">
       <PageHeading
@@ -65,86 +146,106 @@ export function ChecklistView({
         }
         actions={
           isSuperuser ? (
-            <Button size="sm" onClick={() => setFormMode("create")}>
-              <Plus className="h-4 w-4" aria-hidden="true" />
-              {getTranslation(checklistTranslations.addTask, language)}
-            </Button>
+            <>
+              <Button size="sm" variant="outline" onClick={() => openCategoryForm("create")}>
+                <FolderPlus className="h-4 w-4" aria-hidden="true" />
+                {getTranslation(checklistTranslations.addCategory, language)}
+              </Button>
+              <Button size="sm" onClick={() => openItemForm("create")}>
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                {getTranslation(checklistTranslations.addTask, language)}
+              </Button>
+            </>
           ) : undefined
         }
       />
 
-      {isSuperuser && formMode && (
+      {isSuperuser && categoryFormMode && (
+        <ChecklistCategoryForm
+          language={language}
+          initialValues={categoryFormMode === "create" ? undefined : categoryFormMode}
+          onCancel={() => setCategoryFormMode(null)}
+          onSaved={handleCategorySaved}
+          onDeleted={handleCategorySaved}
+        />
+      )}
+
+      {isSuperuser && itemFormMode && (
         <ChecklistItemForm
           language={language}
-          initialValues={formMode === "create" ? undefined : formMode}
-          onCancel={() => setFormMode(null)}
-          onSaved={handleSaved}
-          onDeleted={handleSaved}
+          initialValues={itemFormMode === "create" ? undefined : itemFormMode}
+          categories={categories}
+          onCancel={() => setItemFormMode(null)}
+          onSaved={handleItemSaved}
+          onDeleted={handleItemSaved}
         />
       )}
 
       {toggleError && <p className="text-xs text-destructive">{toggleError}</p>}
 
-      <Card className="w-full">
-        <CardContent className="space-y-1 py-4">
-          {items.length === 0 ? (
+      {items.length === 0 && categories.length === 0 ? (
+        <Card className="w-full">
+          <CardContent className="py-4">
             <p className="text-xs text-muted-foreground">{getTranslation(checklistTranslations.empty, language)}</p>
-          ) : (
-            items.map((item) => {
-              const canUncheck = isSuperuser || item.completedByEmployee?.id === currentEmployeeId;
-              const checkboxDisabled = togglingId === item.id || (item.completed && !canUncheck);
-              return (
-                <div key={item.id} className="flex items-center gap-3 py-1.5">
-                  <input
-                    type="checkbox"
-                    checked={item.completed}
-                    onChange={() => handleToggle(item)}
-                    disabled={checkboxDisabled}
-                    className="h-4 w-4 shrink-0 cursor-pointer rounded border-input accent-primary disabled:cursor-not-allowed disabled:opacity-60"
-                    aria-label={item.label}
-                    title={
-                      item.completed && !canUncheck
-                        ? getTranslation(checklistTranslations.uncheckForbidden, language)
-                        : undefined
-                    }
-                  />
-                  <span className="flex flex-1 flex-col">
-                    <span
-                      className={cn(
-                        "flex items-center gap-2 text-sm",
-                        item.completed && "text-muted-foreground line-through"
-                      )}
-                    >
-                      {item.label}
-                      {item.recurrence !== "ONE_TIME" && (
-                        <Badge variant="outline" className="gap-1 font-normal no-underline">
-                          <Repeat className="h-3 w-3" aria-hidden="true" />
-                          {getTranslation(checklistTranslations[RECURRENCE_TRANSLATION_KEY[item.recurrence]], language)}
-                        </Badge>
-                      )}
-                    </span>
-                    {item.completed && item.completedByEmployee && (
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <User className="h-3 w-3" aria-hidden="true" />
-                        {getTranslation(checklistTranslations.checkedByPrefix, language)}{" "}
-                        {item.completedByEmployee.firstName} {item.completedByEmployee.lastName}
-                      </span>
-                    )}
-                  </span>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          {categories.map((category) => {
+            const categoryItems = items.filter((item) => item.categoryId === category.id);
+            return (
+              <Card key={category.id} className="w-full">
+                <CardHeader className="flex-row items-center justify-between space-y-0 py-3">
+                  <CardTitle className="text-base">{category.name}</CardTitle>
                   {isSuperuser && (
-                    <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setFormMode(item)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => openCategoryForm(category)}
+                    >
                       <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                       <span className="sr-only">
-                        {getTranslation(checklistTranslations.editTask, language)}
+                        {getTranslation(checklistTranslations.editCategory, language)}
                       </span>
                     </Button>
                   )}
-                </div>
-              );
-            })
+                </CardHeader>
+                <CardContent className="space-y-1 pt-0">
+                  {categoryItems.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">
+                      {getTranslation(checklistTranslations.empty, language)}
+                    </p>
+                  ) : (
+                    categoryItems.map(renderItemRow)
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
+
+          {(uncategorizedItems.length > 0 || categories.length === 0) && (
+            <Card className="w-full">
+              {categories.length > 0 && (
+                <CardHeader className="py-3">
+                  <CardTitle className="text-base">
+                    {getTranslation(checklistTranslations.uncategorized, language)}
+                  </CardTitle>
+                </CardHeader>
+              )}
+              <CardContent className={cn("space-y-1", categories.length > 0 ? "pt-0" : "py-4")}>
+                {uncategorizedItems.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    {getTranslation(checklistTranslations.empty, language)}
+                  </p>
+                ) : (
+                  uncategorizedItems.map(renderItemRow)
+                )}
+              </CardContent>
+            </Card>
           )}
-        </CardContent>
-      </Card>
+        </>
+      )}
     </div>
   );
 }

@@ -13,7 +13,13 @@ export type ChecklistItemEntry = {
   label: string;
   recurrence: ChecklistRecurrence;
   completed: boolean;
+  categoryId: string | null;
   completedByEmployee: { id: string; firstName: string; lastName: string } | null;
+};
+
+export type ChecklistCategoryEntry = {
+  id: string;
+  name: string;
 };
 
 export const RECURRENCE_TRANSLATION_KEY = {
@@ -26,18 +32,21 @@ export const RECURRENCE_TRANSLATION_KEY = {
 export function ChecklistItemForm({
   language,
   initialValues,
+  categories,
   onCancel,
   onSaved,
   onDeleted,
 }: {
   language: Language;
   initialValues?: ChecklistItemEntry;
+  categories: ChecklistCategoryEntry[];
   onCancel: () => void;
   onSaved: () => void;
   onDeleted: () => void;
 }) {
   const [label, setLabel] = useState(initialValues?.label ?? "");
   const [recurrence, setRecurrence] = useState<ChecklistRecurrence>(initialValues?.recurrence ?? "ONE_TIME");
+  const [categoryId, setCategoryId] = useState(initialValues?.categoryId ?? "");
   const [error, setError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -51,7 +60,7 @@ export function ChecklistItemForm({
     const response = await fetch(isEditing ? `/api/checklist/${initialValues!.id}` : "/api/checklist", {
       method: isEditing ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ label, recurrence }),
+      body: JSON.stringify({ label, recurrence, categoryId: categoryId || null }),
     });
 
     setSubmitting(false);
@@ -107,6 +116,25 @@ export function ChecklistItemForm({
           {(Object.keys(RECURRENCE_TRANSLATION_KEY) as ChecklistRecurrence[]).map((option) => (
             <option key={option} value={option}>
               {getTranslation(checklistTranslations[RECURRENCE_TRANSLATION_KEY[option]], language)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="space-y-1">
+        <Label htmlFor="checklist-item-category">
+          {getTranslation(checklistTranslations.categoryLabel, language)}
+        </Label>
+        <select
+          id="checklist-item-category"
+          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+          value={categoryId}
+          onChange={(event) => setCategoryId(event.target.value)}
+        >
+          <option value="">{getTranslation(checklistTranslations.noCategoryOption, language)}</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
             </option>
           ))}
         </select>

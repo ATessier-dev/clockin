@@ -39,14 +39,26 @@ export async function POST(request: Request) {
   try {
     await requireSuperuser();
 
-    const body = (await request.json().catch(() => null)) as { label?: unknown; recurrence?: unknown } | null;
+    const body = (await request.json().catch(() => null)) as {
+      label?: unknown;
+      recurrence?: unknown;
+      categoryId?: unknown;
+    } | null;
     const label = typeof body?.label === "string" ? body.label.trim() : "";
     const recurrence = RECURRENCES.includes(body?.recurrence as ChecklistRecurrence)
       ? (body!.recurrence as ChecklistRecurrence)
       : "ONE_TIME";
+    const categoryId = typeof body?.categoryId === "string" && body.categoryId ? body.categoryId : null;
 
     if (!label) {
       return NextResponse.json({ error: "invalid_body" }, { status: 400 });
+    }
+
+    if (categoryId) {
+      const category = await withPrisma((prisma) => prisma.checklistCategory.findUnique({ where: { id: categoryId } }));
+      if (!category) {
+        return NextResponse.json({ error: "invalid_body" }, { status: 400 });
+      }
     }
 
     const lastItem = await withPrisma((prisma) =>
@@ -55,7 +67,7 @@ export async function POST(request: Request) {
 
     const item = await withPrisma((prisma) =>
       prisma.checklistItem.create({
-        data: { label, recurrence, sortOrder: (lastItem?.sortOrder ?? -1) + 1 },
+        data: { label, recurrence, categoryId, sortOrder: (lastItem?.sortOrder ?? -1) + 1 },
       })
     );
 

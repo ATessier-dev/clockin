@@ -23,6 +23,7 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/che
       label?: unknown;
       recurrence?: unknown;
       completed?: unknown;
+      categoryId?: unknown;
     } | null;
 
     const completed = typeof body?.completed === "boolean" ? body.completed : undefined;
@@ -31,11 +32,22 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/che
       isSuperuser && RECURRENCES.includes(body?.recurrence as ChecklistRecurrence)
         ? (body!.recurrence as ChecklistRecurrence)
         : undefined;
+    const categoryId =
+      isSuperuser && (body?.categoryId === null || typeof body?.categoryId === "string")
+        ? body.categoryId || null
+        : undefined;
 
     if (completed === false) {
       const canUncheck = isSuperuser || existing.completedByEmployeeId === session.employeeId;
       if (!canUncheck) {
         return NextResponse.json({ error: "not_owner" }, { status: 403 });
+      }
+    }
+
+    if (categoryId) {
+      const category = await withPrisma((prisma) => prisma.checklistCategory.findUnique({ where: { id: categoryId } }));
+      if (!category) {
+        return NextResponse.json({ error: "invalid_body" }, { status: 400 });
       }
     }
 
@@ -48,6 +60,7 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/che
           completedByEmployeeId: completed === undefined ? undefined : completed ? session.employeeId : null,
           label,
           recurrence,
+          categoryId,
         },
         include: { completedByEmployee: { select: { id: true, firstName: true, lastName: true } } },
       })
