@@ -51,3 +51,35 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/wor
     throw error;
   }
 }
+
+// Shift.workplaceId is required, so a workplace still assigned to shifts
+// can't be deleted at the database level. Checked here first for a clear
+// error instead of a raw foreign key failure.
+export async function DELETE(request: Request, { params }: RouteContext<"/api/workplaces/[id]">) {
+  try {
+    await requireSuperuser();
+    const { id } = await params;
+
+    const existing = await withPrisma((prisma) => prisma.workplace.findUnique({ where: { id } }));
+    if (!existing) {
+      return NextResponse.json({ error: "not_found" }, { status: 404 });
+    }
+
+    const shiftCount = await withPrisma((prisma) => prisma.shift.count({ where: { workplaceId: id } }));
+    if (shiftCount > 0) {
+      return NextResponse.json({ error: "in_use" }, { status: 409 });
+    }
+
+    await withPrisma((prisma) => prisma.workplace.delete({ where: { id } }));
+
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: "forbidden" }, { status: 403 });
+    }
+    throw error;
+  }
+}

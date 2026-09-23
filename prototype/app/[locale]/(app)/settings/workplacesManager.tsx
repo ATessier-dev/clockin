@@ -47,6 +47,7 @@ export function WorkplacesManager({
           initialValues={formMode === "create" ? undefined : formMode}
           onCancel={() => setFormMode(null)}
           onSaved={handleSaved}
+          onDeleted={handleSaved}
         />
       )}
 

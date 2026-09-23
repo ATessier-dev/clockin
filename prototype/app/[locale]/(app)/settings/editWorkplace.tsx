@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,11 +19,13 @@ export function WorkplaceForm({
   initialValues,
   onCancel,
   onSaved,
+  onDeleted,
 }: {
   language: Language;
   initialValues?: WorkplaceEntry;
   onCancel: () => void;
   onSaved: (workplace: WorkplaceEntry) => void;
+  onDeleted: () => void;
 }) {
   const [label, setLabel] = useState(initialValues?.label ?? "");
   const [description, setDescription] = useState(initialValues?.description ?? "");
@@ -52,6 +55,28 @@ export function WorkplaceForm({
 
     const data = (await response.json()) as { workplace: WorkplaceEntry };
     onSaved(data.workplace);
+  }
+
+  async function handleDelete() {
+    if (!initialValues) return;
+    setSubmitting(true);
+    setError(null);
+
+    const response = await fetch(`/api/workplaces/${initialValues.id}`, { method: "DELETE" });
+
+    setSubmitting(false);
+
+    if (!response.ok) {
+      const data = (await response.json().catch(() => null)) as { error?: string } | null;
+      setError(
+        data?.error === "in_use"
+          ? getTranslation(workplacesTranslations.deleteInUseError, language)
+          : getTranslation(workplacesTranslations.saveError, language)
+      );
+      return;
+    }
+
+    onDeleted();
   }
 
   return (
@@ -94,6 +119,12 @@ export function WorkplaceForm({
       {error && <p className="text-xs text-destructive">{error}</p>}
 
       <div className="flex flex-wrap justify-end gap-2">
+        {isEditing && (
+          <Button type="button" variant="destructive" size="sm" onClick={handleDelete} disabled={submitting}>
+            <Trash2 className="h-4 w-4" aria-hidden="true" />
+            {getTranslation(workplacesTranslations.deleteWorkplace, language)}
+          </Button>
+        )}
         <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={submitting}>
           {getTranslation(workplacesTranslations.cancel, language)}
         </Button>
