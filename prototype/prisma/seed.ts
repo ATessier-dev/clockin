@@ -16,9 +16,6 @@ async function main() {
     create: {
       key: "mont-royal",
       label: "Mont-Royal",
-      // Placeholder — replace with the real gallery subnet before relying on
-      // the IP gate outside of dev.
-      allowedCidr: "127.0.0.1/32",
     },
   });
 
@@ -28,7 +25,6 @@ async function main() {
     create: {
       key: "vieux-port",
       label: "Vieux-Port",
-      allowedCidr: "127.0.0.1/32",
     },
   });
 

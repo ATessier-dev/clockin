@@ -4,9 +4,8 @@ import { requireSuperuser, UnauthorizedError, ForbiddenError } from "@/lib/auth/
 
 const WORKPLACE_SELECT = {
   id: true,
-  key: true,
   label: true,
-  allowedCidr: true,
+  description: true,
   color: true,
 } as const;
 
@@ -15,6 +14,20 @@ const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
 function isUniqueConstraintViolation(error: unknown): boolean {
   return Boolean(
     error && typeof error === "object" && "code" in error && (error as { code?: unknown }).code === "P2002"
+  );
+}
+
+// The unique `key` is an internal slug, never shown or entered in the UI.
+// Derived from the label at creation time, with a numeric suffix on
+// collision (two workplaces sharing a label, or a duplicate slug).
+function slugify(value: string): string {
+  return (
+    value
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(new RegExp("[\\u0300-\\u036f]", "g"), "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "workplace"
   );
 }
 
@@ -43,27 +56,36 @@ export async function POST(request: Request) {
     await requireSuperuser();
 
     const body = (await request.json().catch(() => null)) as {
-      key?: unknown;
       label?: unknown;
-      allowedCidr?: unknown;
+      description?: unknown;
       color?: unknown;
     } | null;
 
-    const key = typeof body?.key === "string" ? body.key.trim() : "";
     const label = typeof body?.label === "string" ? body.label.trim() : "";
-    const allowedCidr = typeof body?.allowedCidr === "string" ? body.allowedCidr.trim() : "";
+    const description = typeof body?.description === "string" ? body.description.trim() || null : null;
     const color = typeof body?.color === "string" && HEX_COLOR_PATTERN.test(body.color) ? body.color : "#0ea5e9";
 
-    if (!key || !label || !allowedCidr) {
+    if (!label) {
       return NextResponse.json({ error: "invalid_body" }, { status: 400 });
     }
 
-    const workplace = await withPrisma((prisma) =>
-      prisma.workplace.create({
-        data: { key, label, allowedCidr, color },
-        select: WORKPLACE_SELECT,
-      })
-    );
+    const baseKey = slugify(label);
+    let workplace;
+    for (let attempt = 0; ; attempt += 1) {
+      const key = attempt === 0 ? baseKey : `${baseKey}-${attempt + 1}`;
+      try {
+        workplace = await withPrisma((prisma) =>
+          prisma.workplace.create({
+            data: { key, label, description, color },
+            select: WORKPLACE_SELECT,
+          })
+        );
+        break;
+      } catch (error) {
+        if (isUniqueConstraintViolation(error) && attempt < 5) continue;
+        throw error;
+      }
+    }
 
     return NextResponse.json({ workplace }, { status: 201 });
   } catch (error) {

@@ -67,10 +67,11 @@ export function WorkplacesManager({
                 {getTranslation(workplacesTranslations.editWorkplace, language)}
               </Button>
             </CardHeader>
-            <CardContent className="space-y-1 text-sm text-muted-foreground">
-              <p>{workplace.key}</p>
-              <p className="font-mono text-xs">{workplace.allowedCidr}</p>
-            </CardContent>
+            {workplace.description && (
+              <CardContent className="text-sm text-muted-foreground">
+                <p>{workplace.description}</p>
+              </CardContent>
+            )}
           </Card>
         ))}
       </div>

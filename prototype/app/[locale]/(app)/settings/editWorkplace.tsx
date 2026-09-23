@@ -8,9 +8,8 @@ import { getTranslation, workplacesTranslations, type Language } from "@/transla
 
 export type WorkplaceEntry = {
   id: string;
-  key: string;
   label: string;
-  allowedCidr: string;
+  description: string | null;
   color: string;
 };
 
@@ -25,9 +24,8 @@ export function WorkplaceForm({
   onCancel: () => void;
   onSaved: (workplace: WorkplaceEntry) => void;
 }) {
-  const [key, setKey] = useState(initialValues?.key ?? "");
   const [label, setLabel] = useState(initialValues?.label ?? "");
-  const [allowedCidr, setAllowedCidr] = useState(initialValues?.allowedCidr ?? "");
+  const [description, setDescription] = useState(initialValues?.description ?? "");
   const [color, setColor] = useState(initialValues?.color ?? "#0ea5e9");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -42,18 +40,13 @@ export function WorkplaceForm({
     const response = await fetch(isEditing ? `/api/workplaces/${initialValues!.id}` : "/api/workplaces", {
       method: isEditing ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ key, label, allowedCidr, color }),
+      body: JSON.stringify({ label, description: description || null, color }),
     });
 
     setSubmitting(false);
 
     if (!response.ok) {
-      const data = (await response.json().catch(() => null)) as { error?: string } | null;
-      setError(
-        data?.error === "key_taken"
-          ? getTranslation(workplacesTranslations.keyTaken, language)
-          : getTranslation(workplacesTranslations.saveError, language)
-      );
+      setError(getTranslation(workplacesTranslations.saveError, language));
       return;
     }
 
@@ -69,18 +62,13 @@ export function WorkplaceForm({
       </div>
 
       <div className="space-y-1">
-        <Label htmlFor="workplace-key">{getTranslation(workplacesTranslations.keyLabel, language)}</Label>
-        <Input id="workplace-key" value={key} onChange={(event) => setKey(event.target.value)} required />
-      </div>
-
-      <div className="space-y-1">
-        <Label htmlFor="workplace-cidr">{getTranslation(workplacesTranslations.allowedCidrLabel, language)}</Label>
+        <Label htmlFor="workplace-description">
+          {getTranslation(workplacesTranslations.descriptionLabel, language)}
+        </Label>
         <Input
-          id="workplace-cidr"
-          value={allowedCidr}
-          onChange={(event) => setAllowedCidr(event.target.value)}
-          placeholder="192.168.1.0/24"
-          required
+          id="workplace-description"
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
         />
       </div>
 

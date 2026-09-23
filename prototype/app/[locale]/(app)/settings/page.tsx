@@ -21,7 +21,7 @@ export default async function SettingsPage({ params }: {
         withPrisma((prisma) =>
             prisma.workplace.findMany({
                 orderBy: { label: "asc" },
-                select: { id: true, key: true, label: true, allowedCidr: true, color: true },
+                select: { id: true, label: true, description: true, color: true },
             })
         ),
         withPrisma((prisma) =>

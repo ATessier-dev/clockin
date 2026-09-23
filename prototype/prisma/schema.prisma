@@ -83,13 +83,14 @@ model Employee {
 }
 
 /// Mirrors artur's GalleryLocation (mont-royal, vieux-port) — copied, not
-/// shared, since clockin has its own database. `allowedCidr` is a single
-/// CIDR/subnet string for v1; widen to a list later if a location needs more.
+/// shared, since clockin has its own database.
 model Workplace {
   id          String   @id @default(cuid())
+  /// Stable internal slug (e.g. "mont-royal"), generated from the label at
+  /// creation time. Never shown or editable in the UI.
   key         String   @unique
   label       String
-  allowedCidr String   @map("allowed_cidr")
+  description String?  @db.Text
   /// Hex color (e.g. "#0ea5e9") used to visually distinguish this workplace
   /// wherever it's shown (shift cards, timesheets, etc.).
   color       String   @default("#0ea5e9")
@@ -180,8 +181,8 @@ model ClockEvent {
   shift              Shift?            @relation(fields: [shiftId], references: [id])
   type               ClockEventType
   at                 DateTime          @default(now())
-  /// Which workplace's allowedCidr the request IP matched — null only if a
-  /// superuser creates a manual correction with no network context.
+  /// Best-effort guess at the employee's workplace when they clocked in
+  /// (their preferred workplace); null only if none is set.
   workplaceId        String?           @map("workplace_id")
   workplace          Workplace?        @relation(fields: [workplaceId], references: [id])
   ip                 String            @db.VarChar(45)
