@@ -22,7 +22,7 @@ export default async function ProfilPage({ params }: {
                 firstName: true,
                 lastName: true,
                 phone: true,
-                preferredWorkplaceId: true,
+                preferredPositionId: true,
                 availabilityNote: true,
                 locale: true,
             },
@@ -31,6 +31,10 @@ export default async function ProfilPage({ params }: {
 
     const workplaces = await withPrisma((prisma) =>
         prisma.workplace.findMany({ orderBy: { label: "asc" }, select: { id: true, label: true, color: true } })
+    );
+
+    const positions = await withPrisma((prisma) =>
+        prisma.position.findMany({ orderBy: { sortOrder: "asc" }, select: { id: true, name: true } })
     );
 
     const availabilities = await withPrisma((prisma) =>
@@ -46,7 +50,7 @@ export default async function ProfilPage({ params }: {
                 <ProfileView
                     language={language}
                     employee={{ ...employee, locale: employee.locale === "en" ? "en" : "fr" }}
-                    workplaces={workplaces}
+                    positions={positions}
                 />
                 <AvailabilityEditor
                     language={language}

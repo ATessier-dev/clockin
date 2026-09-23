@@ -60,6 +60,8 @@ model Employee {
   phone               String?
   preferredWorkplaceId String?      @map("preferred_workplace_id")
   preferredWorkplace  Workplace?    @relation("EmployeePreferredWorkplace", fields: [preferredWorkplaceId], references: [id])
+  preferredPositionId String?       @map("preferred_position_id")
+  preferredPosition   Position?     @relation("EmployeePreferredPosition", fields: [preferredPositionId], references: [id], onDelete: SetNull)
   /// Freeform text for now (e.g. "prefers mornings, not available Sundays") —
   /// not structured day/time rows, so it can't be queried/filtered later
   /// without a redesign. Acceptable for v1: it's a note, not a schedule input.
@@ -115,6 +117,7 @@ model Position {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   shifts    Shift[]
+  preferredByEmployees Employee[] @relation("EmployeePreferredPosition")
 
   @@map("positions")
 }

@@ -12,6 +12,7 @@ const EMPLOYEE_SELECT = {
   role: true,
   phone: true,
   preferredWorkplaceId: true,
+  preferredPositionId: true,
   availabilityNote: true,
   locale: true,
   active: true,
@@ -46,6 +47,7 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/emp
       role?: unknown;
       phone?: unknown;
       preferredWorkplaceId?: unknown;
+      preferredPositionId?: unknown;
       availabilityNote?: unknown;
       locale?: unknown;
       active?: unknown;
@@ -56,6 +58,8 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/emp
     const phone = typeof body?.phone === "string" ? body.phone.trim() || null : undefined;
     const preferredWorkplaceId =
       typeof body?.preferredWorkplaceId === "string" ? body.preferredWorkplaceId || null : undefined;
+    const preferredPositionId =
+      typeof body?.preferredPositionId === "string" ? body.preferredPositionId || null : undefined;
     const availabilityNote =
       typeof body?.availabilityNote === "string" ? body.availabilityNote.trim() || null : undefined;
     const locale = body?.locale === "en" || body?.locale === "fr" ? body.locale : undefined;
@@ -80,6 +84,7 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/emp
           role,
           phone,
           preferredWorkplaceId,
+          preferredPositionId,
           availabilityNote,
           locale,
           active,
