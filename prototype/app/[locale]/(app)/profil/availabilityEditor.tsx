@@ -108,8 +108,9 @@ export function AvailabilityEditor({
           <div className="space-y-3">
             {DAYS_OF_WEEK.map((day) => (
               <div key={day} className="space-y-1.5">
-                <p className="text-xs font-semibold text-muted-foreground">
+                <p className="flex items-baseline gap-2 text-xs font-semibold text-muted-foreground">
                   {getTranslation(availabilityTranslations[DAY_LABEL_KEY[day]], language)}
+                  <span className="font-normal">{getTranslation(availabilityTranslations.hours, language)}</span>
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {workplaces.map((workplace) => {

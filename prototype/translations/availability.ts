@@ -2,6 +2,7 @@ import type { Translation } from "./types";
 
 export const availabilityTranslations: Record<string, Translation> = {
     title: { en: "Availability", fr: "Disponibilités" },
+    hours: { en: "11am - 6pm", fr: "11h - 18h" },
     description: {
         en: "Pick the days and workplaces you're available to work.",
         fr: "Choisis les jours et lieux de travail où tu es disponible.",
