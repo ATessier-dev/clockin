@@ -1,7 +1,7 @@
 import type { Translation } from "./types";
 
-export const settingsTranslations: Record<string, Translation> = {
-    title: { en: "Settings", fr: "Paramètres" },
+export const profileTranslations: Record<string, Translation> = {
+    title: { en: "Profile", fr: "Profil" },
     codeLabel: { en: "Login code (cannot be changed)", fr: "Code de connexion (non modifiable)" },
     firstNameLabel: { en: "First name", fr: "Prénom" },
     lastNameLabel: { en: "Last name", fr: "Nom" },

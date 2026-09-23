@@ -5,6 +5,7 @@ export const navbarTranslations: Record<string, Translation> = {
     dashboard: { en: "Dashboard", fr: "Tableau de bord" },
     schedule: { en: "Schedule", fr: "Planning" },
     checklist: { en: "Checklist", fr: "Liste de tâches" },
+    profil: { en: "Profile", fr: "Profil" },
     settings: { en: "Settings", fr: "Paramètres" },
     doc: { en: "Docs", fr: "Docs" },
     timesheets: { en: "Timesheets", fr: "Feuilles de temps" },
