@@ -93,7 +93,7 @@ export function AvailabilityEditor({
   }
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
           <CalendarClock className="h-4 w-4 text-primary" aria-hidden="true" />
