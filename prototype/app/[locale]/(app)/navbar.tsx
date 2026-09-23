@@ -21,10 +21,11 @@ const navItems = [
 const superuserNavItems = [
     { href: "/timesheets", key: "timesheets" },
     { href: "/employees", key: "employees" },
+    { href: "/settings", key: "settings" },
 ] as const;
 
 const trailingNavItems = [
-    { href: "/settings", key: "settings" },
+    { href: "/profil", key: "profil" },
     { href: "/doc", key: "doc" },
 ] as const;
 

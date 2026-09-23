@@ -5,10 +5,10 @@ export * from "./navbar";
 export * from "./clock";
 export * from "./timesheets";
 export * from "./employees";
-export * from "./settings";
 export * from "./workplaces";
 export * from "./checklist";
 export * from "./availability";
+export * from "./profile";
 export type { Language, Translation } from "./types";
 import type { Language, Translation } from "./types";
 

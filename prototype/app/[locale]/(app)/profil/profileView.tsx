@@ -7,9 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getTranslation, settingsTranslations, type Language } from "@/translations";
+import { getTranslation, profileTranslations, type Language } from "@/translations";
 
-export type SettingsEmployee = {
+export type ProfileEmployee = {
   id: string;
   code: string;
   firstName: string;
@@ -22,13 +22,13 @@ export type SettingsEmployee = {
 
 export type WorkplaceOption = { id: string; label: string };
 
-export function SettingsView({
+export function ProfileView({
   language,
   employee,
   workplaces,
 }: {
   language: Language;
-  employee: SettingsEmployee;
+  employee: ProfileEmployee;
   workplaces: WorkplaceOption[];
 }) {
   const router = useRouter();
@@ -86,13 +86,13 @@ export function SettingsView({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
           <UserCog className="h-4 w-4 text-primary" aria-hidden="true" />
-          {getTranslation(settingsTranslations.title, language)}
+          {getTranslation(profileTranslations.title, language)}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="space-y-1">
-            <Label>{getTranslation(settingsTranslations.codeLabel, language)}</Label>
+            <Label>{getTranslation(profileTranslations.codeLabel, language)}</Label>
             <p className="flex items-center gap-1.5 font-mono text-sm text-muted-foreground">
               <KeyRound className="h-3.5 w-3.5" aria-hidden="true" />
               {employee.code}
@@ -100,11 +100,11 @@ export function SettingsView({
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="settings-first-name">
-              {getTranslation(settingsTranslations.firstNameLabel, language)}
+            <Label htmlFor="profile-first-name">
+              {getTranslation(profileTranslations.firstNameLabel, language)}
             </Label>
             <Input
-              id="settings-first-name"
+              id="profile-first-name"
               value={firstName}
               onChange={(event) => setFirstName(event.target.value)}
               required
@@ -112,11 +112,11 @@ export function SettingsView({
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="settings-last-name">
-              {getTranslation(settingsTranslations.lastNameLabel, language)}
+            <Label htmlFor="profile-last-name">
+              {getTranslation(profileTranslations.lastNameLabel, language)}
             </Label>
             <Input
-              id="settings-last-name"
+              id="profile-last-name"
               value={lastName}
               onChange={(event) => setLastName(event.target.value)}
               required
@@ -124,16 +124,16 @@ export function SettingsView({
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="settings-phone">{getTranslation(settingsTranslations.phoneLabel, language)}</Label>
-            <Input id="settings-phone" value={phone} onChange={(event) => setPhone(event.target.value)} />
+            <Label htmlFor="profile-phone">{getTranslation(profileTranslations.phoneLabel, language)}</Label>
+            <Input id="profile-phone" value={phone} onChange={(event) => setPhone(event.target.value)} />
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="settings-workplace">
-              {getTranslation(settingsTranslations.preferredWorkplaceLabel, language)}
+            <Label htmlFor="profile-workplace">
+              {getTranslation(profileTranslations.preferredWorkplaceLabel, language)}
             </Label>
             <select
-              id="settings-workplace"
+              id="profile-workplace"
               className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
               value={preferredWorkplaceId}
               onChange={(event) => setPreferredWorkplaceId(event.target.value)}
@@ -148,20 +148,20 @@ export function SettingsView({
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="settings-note">
-              {getTranslation(settingsTranslations.availabilityNoteLabel, language)}
+            <Label htmlFor="profile-note">
+              {getTranslation(profileTranslations.availabilityNoteLabel, language)}
             </Label>
             <Input
-              id="settings-note"
+              id="profile-note"
               value={availabilityNote}
               onChange={(event) => setAvailabilityNote(event.target.value)}
             />
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="settings-locale">{getTranslation(settingsTranslations.localeLabel, language)}</Label>
+            <Label htmlFor="profile-locale">{getTranslation(profileTranslations.localeLabel, language)}</Label>
             <select
-              id="settings-locale"
+              id="profile-locale"
               className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
               value={locale}
               onChange={(event) => setLocale(event.target.value as Language)}
@@ -172,18 +172,18 @@ export function SettingsView({
           </div>
 
           {error && (
-            <p className="text-xs text-destructive">{getTranslation(settingsTranslations.saveError, language)}</p>
+            <p className="text-xs text-destructive">{getTranslation(profileTranslations.saveError, language)}</p>
           )}
           {saved && (
             <p className="flex items-center gap-1 text-xs text-muted-foreground">
               <Check className="h-3.5 w-3.5" aria-hidden="true" />
-              {getTranslation(settingsTranslations.saved, language)}
+              {getTranslation(profileTranslations.saved, language)}
             </p>
           )}
 
           <Button type="submit" size="sm" disabled={submitting}>
             <Save className="h-4 w-4" aria-hidden="true" />
-            {getTranslation(settingsTranslations.save, language)}
+            {getTranslation(profileTranslations.save, language)}
           </Button>
         </form>
       </CardContent>
