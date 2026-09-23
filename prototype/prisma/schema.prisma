@@ -103,8 +103,7 @@ model Workplace {
 }
 
 /// A job position/role an employee can be scheduled for (e.g. "Galeriste").
-/// Superuser-managed catalog. Only a name and a color badge for now; not
-/// yet linked to Shift or Employee.
+/// Superuser-managed catalog. Just a name and a color badge for now.
 model Position {
   id        String   @id @default(cuid())
   name      String
@@ -114,6 +113,8 @@ model Position {
   sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  shifts    Shift[]
 
   @@map("positions")
 }
@@ -146,6 +147,10 @@ model Shift {
   employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   workplaceId String   @map("workplace_id")
   workplace   Workplace @relation(fields: [workplaceId], references: [id])
+  /// Optional so existing shifts predating this field, or a deleted
+  /// position, stay valid. New shifts always set one from the schedule form.
+  positionId  String?  @map("position_id")
+  position    Position? @relation(fields: [positionId], references: [id], onDelete: SetNull)
   startAt     DateTime @map("start_at")
   endAt       DateTime @map("end_at")
   createdAt   DateTime @default(now()) @map("created_at")
@@ -155,6 +160,7 @@ model Shift {
 
   @@index([employeeId, startAt])
   @@index([workplaceId, startAt])
+  @@index([positionId])
   @@map("shifts")
 }
 

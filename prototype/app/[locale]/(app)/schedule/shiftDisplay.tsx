@@ -9,10 +9,12 @@ export type ShiftListItem = {
     id: string;
     employeeId: string;
     workplaceId: string;
+    positionId: string | null;
     startAt: Date;
     endAt: Date;
     employee: { firstName: string; lastName: string };
     workplace: { label: string; color: string } | null;
+    position: { name: string; color: string } | null;
 };
 
 export function ShiftDisplay({
@@ -36,7 +38,16 @@ function getShiftCard(shift: ShiftListItem, renderActions?: (shift: ShiftListIte
             className="w-[90%]"
             style={shift.workplace ? { borderLeftColor: shift.workplace.color } : undefined}
         >
-            <ShiftTitle>Galeriste</ShiftTitle>
+            {shift.position && (
+                <ShiftTitle className="flex items-center gap-1.5">
+                    <span
+                        className="h-2 w-2 shrink-0 rounded-full"
+                        style={{ backgroundColor: shift.position.color }}
+                        aria-hidden="true"
+                    />
+                    {shift.position.name}
+                </ShiftTitle>
+            )}
             <ShiftEmployee>{shift.employee.firstName} {shift.employee.lastName}</ShiftEmployee>
             <ShiftTime>{format(shift.startAt, "HH:mm")} -- {format(shift.endAt, "HH:mm")}</ShiftTime>
             {shift.workplace && (

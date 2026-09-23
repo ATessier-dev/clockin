@@ -32,15 +32,17 @@ export default async function SchedulePage({params, searchParams} : {
                 id: true,
                 employeeId: true,
                 workplaceId: true,
+                positionId: true,
                 startAt: true,
                 endAt: true,
                 employee: { select: { firstName: true, lastName: true } },
                 workplace: { select: { label: true, color: true } },
+                position: { select: { name: true, color: true } },
             },
         })
     );
 
-    const [employees, workplaces, teamAvailabilities] = isSuperuser
+    const [employees, workplaces, positions, teamAvailabilities] = isSuperuser
         ? await Promise.all([
               withPrisma((prisma) =>
                   prisma.employee.findMany({
@@ -56,13 +58,19 @@ export default async function SchedulePage({params, searchParams} : {
                   })
               ),
               withPrisma((prisma) =>
+                  prisma.position.findMany({
+                      orderBy: { sortOrder: "asc" },
+                      select: { id: true, name: true },
+                  })
+              ),
+              withPrisma((prisma) =>
                   prisma.employeeAvailability.findMany({
                       where: { employee: { active: true } },
                       select: { employeeId: true, dayOfWeek: true, workplaceId: true },
                   })
               ),
           ])
-        : [[], [], []];
+        : [[], [], [], []];
 
     return (
         <main className="p-4">
@@ -76,6 +84,7 @@ export default async function SchedulePage({params, searchParams} : {
                 isSuperuser={isSuperuser}
                 employees={employees}
                 workplaces={workplaces}
+                positions={positions}
                 teamAvailabilities={teamAvailabilities}
             />
         </main>

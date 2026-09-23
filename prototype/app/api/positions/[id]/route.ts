@@ -38,8 +38,8 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/pos
   }
 }
 
-// Positions are not yet referenced by Shift or Employee, so deleting one is
-// always safe. Revisit this once a position can be assigned elsewhere.
+// Deleting a position never deletes its shifts. Shift.positionId is
+// onDelete: SetNull, so shifts simply lose their position.
 export async function DELETE(request: Request, { params }: RouteContext<"/api/positions/[id]">) {
   try {
     await requireSuperuser();

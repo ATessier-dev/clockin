@@ -33,6 +33,7 @@ export async function GET(request: NextRequest) {
         include: {
           employee: { select: { firstName: true, lastName: true } },
           workplace: { select: { label: true, color: true } },
+          position: { select: { name: true, color: true } },
         },
       })
     );
@@ -53,18 +54,21 @@ export async function POST(request: Request) {
     const body = (await request.json().catch(() => null)) as {
       employeeId?: unknown;
       workplaceId?: unknown;
+      positionId?: unknown;
       startAt?: unknown;
       endAt?: unknown;
     } | null;
 
     const employeeId = typeof body?.employeeId === "string" ? body.employeeId : "";
     const workplaceId = typeof body?.workplaceId === "string" ? body.workplaceId : "";
+    const positionId = typeof body?.positionId === "string" ? body.positionId : "";
     const startAt = typeof body?.startAt === "string" ? new Date(body.startAt) : null;
     const endAt = typeof body?.endAt === "string" ? new Date(body.endAt) : null;
 
     if (
       !employeeId ||
       !workplaceId ||
+      !positionId ||
       !startAt ||
       !endAt ||
       Number.isNaN(startAt.getTime()) ||
@@ -79,7 +83,7 @@ export async function POST(request: Request) {
 
     const shift = await withPrisma((prisma) =>
       prisma.shift.create({
-        data: { employeeId, workplaceId, startAt, endAt },
+        data: { employeeId, workplaceId, positionId, startAt, endAt },
       })
     );
 

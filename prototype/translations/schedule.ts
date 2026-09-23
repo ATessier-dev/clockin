@@ -14,6 +14,7 @@ export const scheduleCalendarTranslations: Record<string, Translation> = {
     cancel: { en: "Cancel", fr: "Annuler" },
     employeeLabel: { en: "Employee", fr: "Employé" },
     workplaceLabel: { en: "Workplace", fr: "Lieu" },
+    positionLabel: { en: "Position", fr: "Poste" },
     startAtLabel: { en: "Start", fr: "Début" },
     endAtLabel: { en: "End", fr: "Fin" },
     saveError: { en: "Something went wrong, please try again.", fr: "Une erreur est survenue, réessaie." },

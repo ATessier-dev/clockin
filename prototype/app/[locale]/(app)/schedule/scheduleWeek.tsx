@@ -27,6 +27,7 @@ import {
   shiftToFormDefaults,
   type EmployeeOption,
   type WorkplaceOption,
+  type PositionOption,
 } from "./editSchedule";
 import { dateLocales } from "./clockDisplay";
 import { TeamAvailabilityPanel, type TeamAvailabilityEntry } from "./teamAvailability";
@@ -35,10 +36,12 @@ type RawShift = {
   id: string;
   employeeId: string;
   workplaceId: string;
+  positionId: string | null;
   startAt: string;
   endAt: string;
   employee: { firstName: string; lastName: string };
   workplace: { label: string; color: string } | null;
+  position: { name: string; color: string } | null;
 };
 
 function toShiftListItem(raw: RawShift): ShiftListItem {
@@ -46,8 +49,10 @@ function toShiftListItem(raw: RawShift): ShiftListItem {
     id: raw.id,
     employeeId: raw.employeeId,
     workplaceId: raw.workplaceId,
+    positionId: raw.positionId,
     employee: raw.employee,
     workplace: raw.workplace,
+    position: raw.position,
     startAt: new Date(raw.startAt),
     endAt: new Date(raw.endAt),
   };
@@ -62,6 +67,7 @@ export function ScheduleWeek({
   isSuperuser,
   employees,
   workplaces,
+  positions,
   teamAvailabilities,
 }: {
   language: Language;
@@ -72,6 +78,7 @@ export function ScheduleWeek({
   isSuperuser: boolean;
   employees: EmployeeOption[];
   workplaces: WorkplaceOption[];
+  positions: PositionOption[];
   teamAvailabilities: TeamAvailabilityEntry[];
 }) {
   const router = useRouter();
@@ -347,6 +354,7 @@ export function ScheduleWeek({
                 language={language}
                 employees={employees}
                 workplaces={workplaces}
+                positions={positions}
                 onCancel={() => {
                   setFormMode(null);
                   setPrefillDate(null);
@@ -434,6 +442,7 @@ export function ScheduleWeek({
                         language={language}
                         employees={employees}
                         workplaces={workplaces}
+                        positions={positions}
                         initialValues={
                           isEditingThisDay
                             ? shiftToFormDefaults(formMode as ShiftListItem)

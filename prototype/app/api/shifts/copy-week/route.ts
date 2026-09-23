@@ -50,6 +50,7 @@ export async function POST(request: Request) {
                 data: {
                   employeeId: shift.employeeId,
                   workplaceId: shift.workplaceId,
+                  positionId: shift.positionId,
                   startAt: new Date(shift.startAt.getTime() + offsetMs),
                   endAt: new Date(shift.endAt.getTime() + offsetMs),
                 },
