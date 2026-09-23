@@ -12,6 +12,7 @@ export type DocLinkEntry = {
   id: string;
   title: string;
   url: string;
+  description: string | null;
   categoryId: string | null;
 };
 
@@ -32,6 +33,7 @@ export function DocLinkForm({
 }) {
   const [title, setTitle] = useState(initialValues?.title ?? "");
   const [url, setUrl] = useState(initialValues?.url ?? "");
+  const [description, setDescription] = useState(initialValues?.description ?? "");
   const [categoryId, setCategoryId] = useState(initialValues?.categoryId ?? "");
   const [error, setError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -46,7 +48,7 @@ export function DocLinkForm({
     const response = await fetch(isEditing ? `/api/doc/links/${initialValues!.id}` : "/api/doc/links", {
       method: isEditing ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, url, categoryId: categoryId || null }),
+      body: JSON.stringify({ title, url, description: description || null, categoryId: categoryId || null }),
     });
 
     setSubmitting(false);
@@ -92,6 +94,17 @@ export function DocLinkForm({
           onChange={(event) => setUrl(event.target.value)}
           placeholder="https://..."
           required
+        />
+      </div>
+
+      <div className="space-y-1">
+        <Label htmlFor="doc-link-description">
+          {getTranslation(docTranslations.descriptionLabel, language)}
+        </Label>
+        <Input
+          id="doc-link-description"
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
         />
       </div>
 

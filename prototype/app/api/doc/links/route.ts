@@ -24,11 +24,13 @@ export async function POST(request: Request) {
     const body = (await request.json().catch(() => null)) as {
       title?: unknown;
       url?: unknown;
+      description?: unknown;
       categoryId?: unknown;
     } | null;
 
     const title = typeof body?.title === "string" ? body.title.trim() : "";
     const url = typeof body?.url === "string" ? body.url.trim() : "";
+    const description = typeof body?.description === "string" ? body.description.trim() || null : null;
     const categoryId = typeof body?.categoryId === "string" && body.categoryId ? body.categoryId : null;
 
     if (!title || !url) {
@@ -46,7 +48,7 @@ export async function POST(request: Request) {
 
     const link = await withPrisma((prisma) =>
       prisma.docLink.create({
-        data: { title, url, categoryId, sortOrder: (lastLink?.sortOrder ?? -1) + 1 },
+        data: { title, url, description, categoryId, sortOrder: (lastLink?.sortOrder ?? -1) + 1 },
       })
     );
 

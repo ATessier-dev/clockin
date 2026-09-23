@@ -51,15 +51,20 @@ export function DocView({
   function renderLinkRow(link: DocLinkEntry) {
     return (
       <div key={link.id} className="flex items-center gap-3 py-1.5">
-        <a
-          href={link.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex flex-1 items-center gap-2 text-sm text-primary underline-offset-4 hover:underline"
-        >
-          <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-          {link.title}
-        </a>
+        <span className="flex flex-1 flex-col">
+          <a
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-sm text-primary underline-offset-4 hover:underline"
+          >
+            <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            {link.title}
+          </a>
+          {link.description && (
+            <span className="text-xs text-muted-foreground">{link.description}</span>
+          )}
+        </span>
         {isSuperuser && (
           <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => openLinkForm(link)}>
             <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
