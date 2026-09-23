@@ -102,6 +102,21 @@ model Workplace {
   @@map("workplaces")
 }
 
+/// A job position/role an employee can be scheduled for (e.g. "Galeriste").
+/// Superuser-managed catalog — just a name + color badge for now.
+model Position {
+  id        String   @id @default(cuid())
+  name      String
+  /// Hex color (e.g. "#0ea5e9") shown as a small badge wherever the position
+  /// is displayed.
+  color     String   @default("#0ea5e9")
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("positions")
+}
+
 /// A day/workplace pair an employee has marked themselves available for,
 /// self-edited from their own /settings page (e.g. "Tuesday at Mont-Royal
 /// and/or Saint-Paul"). A preference signal only — it doesn't create or

@@ -3,6 +3,7 @@ import { withPrisma } from '@/lib/withPrisma';
 import { redirect } from '@/i18n/navigation';
 import { type Language } from '@/translations';
 import { WorkplacesManager } from './workplacesManager';
+import { PositionsManager } from './positionsManager';
 
 export default async function SettingsPage({ params }: {
     params: Promise<{ locale: string }>;
@@ -16,16 +17,25 @@ export default async function SettingsPage({ params }: {
         redirect({ href: "/dashboard", locale });
     }
 
-    const workplaces = await withPrisma((prisma) =>
-        prisma.workplace.findMany({
-            orderBy: { label: "asc" },
-            select: { id: true, key: true, label: true, allowedCidr: true, color: true },
-        })
-    );
+    const [workplaces, positions] = await Promise.all([
+        withPrisma((prisma) =>
+            prisma.workplace.findMany({
+                orderBy: { label: "asc" },
+                select: { id: true, key: true, label: true, allowedCidr: true, color: true },
+            })
+        ),
+        withPrisma((prisma) =>
+            prisma.position.findMany({
+                orderBy: { sortOrder: "asc" },
+                select: { id: true, name: true, color: true },
+            })
+        ),
+    ]);
 
     return (
         <main className="flex flex-col items-center gap-6 p-4">
             <WorkplacesManager language={language} workplaces={workplaces} />
+            <PositionsManager language={language} positions={positions} />
         </main>
     );
 }

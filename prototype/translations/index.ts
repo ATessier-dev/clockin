@@ -6,6 +6,7 @@ export * from "./clock";
 export * from "./timesheets";
 export * from "./employees";
 export * from "./workplaces";
+export * from "./positions";
 export * from "./checklist";
 export * from "./availability";
 export * from "./profile";
