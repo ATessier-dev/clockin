@@ -35,8 +35,8 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/che
   }
 }
 
-// Deleting a category never deletes its items — ChecklistItem.categoryId is
-// onDelete: SetNull, so items just become uncategorized.
+// Deleting a category never deletes its items. ChecklistItem.categoryId is
+// onDelete: SetNull, so items simply become uncategorized.
 export async function DELETE(request: Request, { params }: RouteContext<"/api/checklist/categories/[id]">) {
   try {
     await requireSuperuser();

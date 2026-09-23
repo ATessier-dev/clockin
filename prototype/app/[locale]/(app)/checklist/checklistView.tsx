@@ -133,6 +133,8 @@ export function ChecklistView({
   }
 
   const categoryIds = new Set(categories.map((category) => category.id));
+  // Also catches an item whose category was deleted between the two page
+  // queries; it should still land in the uncategorized group, not vanish.
   const uncategorizedItems = items.filter((item) => !item.categoryId || !categoryIds.has(item.categoryId));
 
   return (
