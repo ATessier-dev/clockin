@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,9 +9,8 @@ import { getTranslation, workplacesTranslations, type Language } from "@/transla
 
 export type WorkplaceEntry = {
   id: string;
-  key: string;
   label: string;
-  allowedCidr: string;
+  description: string | null;
   color: string;
 };
 
@@ -19,15 +19,16 @@ export function WorkplaceForm({
   initialValues,
   onCancel,
   onSaved,
+  onDeleted,
 }: {
   language: Language;
   initialValues?: WorkplaceEntry;
   onCancel: () => void;
   onSaved: (workplace: WorkplaceEntry) => void;
+  onDeleted: () => void;
 }) {
-  const [key, setKey] = useState(initialValues?.key ?? "");
   const [label, setLabel] = useState(initialValues?.label ?? "");
-  const [allowedCidr, setAllowedCidr] = useState(initialValues?.allowedCidr ?? "");
+  const [description, setDescription] = useState(initialValues?.description ?? "");
   const [color, setColor] = useState(initialValues?.color ?? "#0ea5e9");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -42,23 +43,40 @@ export function WorkplaceForm({
     const response = await fetch(isEditing ? `/api/workplaces/${initialValues!.id}` : "/api/workplaces", {
       method: isEditing ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ key, label, allowedCidr, color }),
+      body: JSON.stringify({ label, description: description || null, color }),
     });
+
+    setSubmitting(false);
+
+    if (!response.ok) {
+      setError(getTranslation(workplacesTranslations.saveError, language));
+      return;
+    }
+
+    const data = (await response.json()) as { workplace: WorkplaceEntry };
+    onSaved(data.workplace);
+  }
+
+  async function handleDelete() {
+    if (!initialValues) return;
+    setSubmitting(true);
+    setError(null);
+
+    const response = await fetch(`/api/workplaces/${initialValues.id}`, { method: "DELETE" });
 
     setSubmitting(false);
 
     if (!response.ok) {
       const data = (await response.json().catch(() => null)) as { error?: string } | null;
       setError(
-        data?.error === "key_taken"
-          ? getTranslation(workplacesTranslations.keyTaken, language)
+        data?.error === "in_use"
+          ? getTranslation(workplacesTranslations.deleteInUseError, language)
           : getTranslation(workplacesTranslations.saveError, language)
       );
       return;
     }
 
-    const data = (await response.json()) as { workplace: WorkplaceEntry };
-    onSaved(data.workplace);
+    onDeleted();
   }
 
   return (
@@ -69,18 +87,13 @@ export function WorkplaceForm({
       </div>
 
       <div className="space-y-1">
-        <Label htmlFor="workplace-key">{getTranslation(workplacesTranslations.keyLabel, language)}</Label>
-        <Input id="workplace-key" value={key} onChange={(event) => setKey(event.target.value)} required />
-      </div>
-
-      <div className="space-y-1">
-        <Label htmlFor="workplace-cidr">{getTranslation(workplacesTranslations.allowedCidrLabel, language)}</Label>
+        <Label htmlFor="workplace-description">
+          {getTranslation(workplacesTranslations.descriptionLabel, language)}
+        </Label>
         <Input
-          id="workplace-cidr"
-          value={allowedCidr}
-          onChange={(event) => setAllowedCidr(event.target.value)}
-          placeholder="192.168.1.0/24"
-          required
+          id="workplace-description"
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
         />
       </div>
 
@@ -106,6 +119,12 @@ export function WorkplaceForm({
       {error && <p className="text-xs text-destructive">{error}</p>}
 
       <div className="flex flex-wrap justify-end gap-2">
+        {isEditing && (
+          <Button type="button" variant="destructive" size="sm" onClick={handleDelete} disabled={submitting}>
+            <Trash2 className="h-4 w-4" aria-hidden="true" />
+            {getTranslation(workplacesTranslations.deleteWorkplace, language)}
+          </Button>
+        )}
         <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={submitting}>
           {getTranslation(workplacesTranslations.cancel, language)}
         </Button>

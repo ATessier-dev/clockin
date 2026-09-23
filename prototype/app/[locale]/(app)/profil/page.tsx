@@ -22,7 +22,7 @@ export default async function ProfilPage({ params }: {
                 firstName: true,
                 lastName: true,
                 phone: true,
-                preferredWorkplaceId: true,
+                preferredPositionId: true,
                 availabilityNote: true,
                 locale: true,
             },
@@ -33,6 +33,10 @@ export default async function ProfilPage({ params }: {
         prisma.workplace.findMany({ orderBy: { label: "asc" }, select: { id: true, label: true, color: true } })
     );
 
+    const positions = await withPrisma((prisma) =>
+        prisma.position.findMany({ orderBy: { sortOrder: "asc" }, select: { id: true, name: true } })
+    );
+
     const availabilities = await withPrisma((prisma) =>
         prisma.employeeAvailability.findMany({
             where: { employeeId: sessionUser.employeeId },
@@ -41,18 +45,20 @@ export default async function ProfilPage({ params }: {
     );
 
     return (
-        <main className="flex flex-col items-center gap-6 p-4">
-            <ProfileView
-                language={language}
-                employee={{ ...employee, locale: employee.locale === "en" ? "en" : "fr" }}
-                workplaces={workplaces}
-            />
-            <AvailabilityEditor
-                language={language}
-                employeeId={sessionUser.employeeId}
-                workplaces={workplaces}
-                initialAvailabilities={availabilities}
-            />
+        <main className="p-4">
+            <div className="mx-auto grid w-full max-w-4xl grid-cols-1 items-start gap-6 lg:grid-cols-2">
+                <ProfileView
+                    language={language}
+                    employee={{ ...employee, locale: employee.locale === "en" ? "en" : "fr" }}
+                    positions={positions}
+                />
+                <AvailabilityEditor
+                    language={language}
+                    employeeId={sessionUser.employeeId}
+                    workplaces={workplaces}
+                    initialAvailabilities={availabilities}
+                />
+            </div>
         </main>
     );
 }

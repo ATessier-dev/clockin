@@ -60,6 +60,8 @@ model Employee {
   phone               String?
   preferredWorkplaceId String?      @map("preferred_workplace_id")
   preferredWorkplace  Workplace?    @relation("EmployeePreferredWorkplace", fields: [preferredWorkplaceId], references: [id])
+  preferredPositionId String?       @map("preferred_position_id")
+  preferredPosition   Position?     @relation("EmployeePreferredPosition", fields: [preferredPositionId], references: [id], onDelete: SetNull)
   /// Freeform text for now (e.g. "prefers mornings, not available Sundays") —
   /// not structured day/time rows, so it can't be queried/filtered later
   /// without a redesign. Acceptable for v1: it's a note, not a schedule input.
@@ -81,13 +83,14 @@ model Employee {
 }
 
 /// Mirrors artur's GalleryLocation (mont-royal, vieux-port) — copied, not
-/// shared, since clockin has its own database. `allowedCidr` is a single
-/// CIDR/subnet string for v1; widen to a list later if a location needs more.
+/// shared, since clockin has its own database.
 model Workplace {
   id          String   @id @default(cuid())
+  /// Stable internal slug (e.g. "mont-royal"), generated from the label at
+  /// creation time. Never shown or editable in the UI.
   key         String   @unique
   label       String
-  allowedCidr String   @map("allowed_cidr")
+  description String?  @db.Text
   /// Hex color (e.g. "#0ea5e9") used to visually distinguish this workplace
   /// wherever it's shown (shift cards, timesheets, etc.).
   color       String   @default("#0ea5e9")
@@ -98,13 +101,53 @@ model Workplace {
   shifts               Shift[]
   clockEvents          ClockEvent[]
   availabilities       EmployeeAvailability[]
+  dailyMeetings        DailyMeeting[]
+  galleryEvents        GalleryEvent[]
 
   @@map("workplaces")
 }
 
+/// A recurring meeting (e.g. "Stand-up") shown on the schedule for each day
+/// of the week it repeats on. Superuser-managed.
+model DailyMeeting {
+  id          String      @id @default(cuid())
+  name        String
+  /// 24h "HH:mm" time of day, e.g. "09:00".
+  time        String
+  /// Days of the week this meeting repeats on (e.g. [MONDAY, TUESDAY]).
+  /// Never empty; enforced at the API level, not the database.
+  days        DayOfWeek[]
+  workplaceId String      @map("workplace_id")
+  workplace   Workplace   @relation(fields: [workplaceId], references: [id])
+  sortOrder   Int         @default(0) @map("sort_order")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  @@index([workplaceId])
+  @@map("daily_meetings")
+}
+
+/// A one-off event happening at a workplace (e.g. an opening, a private
+/// viewing), shown on the schedule for the days it spans. Superuser-managed.
+model GalleryEvent {
+  id          String     @id @default(cuid())
+  title       String
+  description String?    @db.Text
+  startAt     DateTime   @map("start_at")
+  endAt       DateTime   @map("end_at")
+  /// Optional: an event isn't always tied to one specific workplace.
+  workplaceId String?    @map("workplace_id")
+  workplace   Workplace? @relation(fields: [workplaceId], references: [id], onDelete: SetNull)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  @@index([startAt])
+  @@index([workplaceId])
+  @@map("gallery_events")
+}
+
 /// A job position/role an employee can be scheduled for (e.g. "Galeriste").
-/// Superuser-managed catalog. Only a name and a color badge for now; not
-/// yet linked to Shift or Employee.
+/// Superuser-managed catalog. Just a name and a color badge for now.
 model Position {
   id        String   @id @default(cuid())
   name      String
@@ -114,6 +157,9 @@ model Position {
   sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  shifts    Shift[]
+  preferredByEmployees Employee[] @relation("EmployeePreferredPosition")
 
   @@map("positions")
 }
@@ -146,6 +192,10 @@ model Shift {
   employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   workplaceId String   @map("workplace_id")
   workplace   Workplace @relation(fields: [workplaceId], references: [id])
+  /// Optional so existing shifts predating this field, or a deleted
+  /// position, stay valid. New shifts always set one from the schedule form.
+  positionId  String?  @map("position_id")
+  position    Position? @relation(fields: [positionId], references: [id], onDelete: SetNull)
   startAt     DateTime @map("start_at")
   endAt       DateTime @map("end_at")
   createdAt   DateTime @default(now()) @map("created_at")
@@ -155,6 +205,7 @@ model Shift {
 
   @@index([employeeId, startAt])
   @@index([workplaceId, startAt])
+  @@index([positionId])
   @@map("shifts")
 }
 
@@ -171,8 +222,8 @@ model ClockEvent {
   shift              Shift?            @relation(fields: [shiftId], references: [id])
   type               ClockEventType
   at                 DateTime          @default(now())
-  /// Which workplace's allowedCidr the request IP matched — null only if a
-  /// superuser creates a manual correction with no network context.
+  /// Best-effort guess at the employee's workplace when they clocked in
+  /// (their preferred workplace); null only if none is set.
   workplaceId        String?           @map("workplace_id")
   workplace          Workplace?        @relation(fields: [workplaceId], references: [id])
   ip                 String            @db.VarChar(45)
@@ -188,17 +239,37 @@ model ClockEvent {
   @@map("clock_events")
 }
 
-/// Backs the /links docs page.
-model Link {
-  id        String   @id @default(cuid())
-  title     String
-  url       String   @db.VarChar(500)
-  category  String?
-  sortOrder Int      @default(0) @map("sort_order")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+/// Groups DocLinks for display (one card per category on the /doc page).
+/// Only a superuser can create, rename, or delete categories. Deleting a
+/// category never deletes its links; they simply fall back to
+/// "uncategorized" (see DocLink.categoryId's onDelete: SetNull).
+model DocCategory {
+  id        String    @id @default(cuid())
+  name      String
+  sortOrder Int       @default(0) @map("sort_order")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
-  @@map("links")
+  links     DocLink[]
+
+  @@map("doc_categories")
+}
+
+/// A single documentation link on the /doc page. Superuser-managed, like
+/// the checklist and its categories.
+model DocLink {
+  id         String       @id @default(cuid())
+  title      String
+  url        String       @db.VarChar(500)
+  /// Optional. Null means the link is shown in the "uncategorized" group.
+  categoryId String?      @map("category_id")
+  category   DocCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  sortOrder  Int          @default(0) @map("sort_order")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+
+  @@index([categoryId])
+  @@map("doc_links")
 }
 
 /// Groups ChecklistItems for display (one card per category on the

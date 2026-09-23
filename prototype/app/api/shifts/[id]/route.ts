@@ -41,6 +41,7 @@ export async function PATCH(
     const body = (await request.json().catch(() => null)) as {
       employeeId?: unknown;
       workplaceId?: unknown;
+      positionId?: unknown;
       startAt?: unknown;
       endAt?: unknown;
     } | null;
@@ -52,6 +53,7 @@ export async function PATCH(
 
     const employeeId = typeof body?.employeeId === "string" ? body.employeeId : undefined;
     const workplaceId = typeof body?.workplaceId === "string" ? body.workplaceId : undefined;
+    const positionId = typeof body?.positionId === "string" ? body.positionId : undefined;
     const startAt = typeof body?.startAt === "string" ? new Date(body.startAt) : undefined;
     const endAt = typeof body?.endAt === "string" ? new Date(body.endAt) : undefined;
 
@@ -71,7 +73,7 @@ export async function PATCH(
     const shift = await withPrisma((prisma) =>
       prisma.shift.update({
         where: { id },
-        data: { employeeId, workplaceId, startAt, endAt },
+        data: { employeeId, workplaceId, positionId, startAt, endAt },
       })
     );
 

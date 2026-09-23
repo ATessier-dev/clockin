@@ -15,21 +15,21 @@ export type ProfileEmployee = {
   firstName: string;
   lastName: string;
   phone: string | null;
-  preferredWorkplaceId: string | null;
+  preferredPositionId: string | null;
   availabilityNote: string | null;
   locale: Language;
 };
 
-export type WorkplaceOption = { id: string; label: string };
+export type PositionOption = { id: string; name: string };
 
 export function ProfileView({
   language,
   employee,
-  workplaces,
+  positions,
 }: {
   language: Language;
   employee: ProfileEmployee;
-  workplaces: WorkplaceOption[];
+  positions: PositionOption[];
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -37,7 +37,7 @@ export function ProfileView({
   const [firstName, setFirstName] = useState(employee.firstName);
   const [lastName, setLastName] = useState(employee.lastName);
   const [phone, setPhone] = useState(employee.phone ?? "");
-  const [preferredWorkplaceId, setPreferredWorkplaceId] = useState(employee.preferredWorkplaceId ?? "");
+  const [preferredPositionId, setPreferredPositionId] = useState(employee.preferredPositionId ?? "");
   const [availabilityNote, setAvailabilityNote] = useState(employee.availabilityNote ?? "");
   const [locale, setLocale] = useState<Language>(employee.locale);
   const [submitting, setSubmitting] = useState(false);
@@ -57,7 +57,7 @@ export function ProfileView({
         firstName,
         lastName,
         phone: phone || null,
-        preferredWorkplaceId: preferredWorkplaceId || null,
+        preferredPositionId: preferredPositionId || null,
         availabilityNote: availabilityNote || null,
         locale,
       }),
@@ -82,7 +82,7 @@ export function ProfileView({
   }
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
           <UserCog className="h-4 w-4 text-primary" aria-hidden="true" />
@@ -129,19 +129,19 @@ export function ProfileView({
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="profile-workplace">
-              {getTranslation(profileTranslations.preferredWorkplaceLabel, language)}
+            <Label htmlFor="profile-position">
+              {getTranslation(profileTranslations.preferredPositionLabel, language)}
             </Label>
             <select
-              id="profile-workplace"
+              id="profile-position"
               className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-              value={preferredWorkplaceId}
-              onChange={(event) => setPreferredWorkplaceId(event.target.value)}
+              value={preferredPositionId}
+              onChange={(event) => setPreferredPositionId(event.target.value)}
             >
               <option value="">—</option>
-              {workplaces.map((workplace) => (
-                <option key={workplace.id} value={workplace.id}>
-                  {workplace.label}
+              {positions.map((position) => (
+                <option key={position.id} value={position.id}>
+                  {position.name}
                 </option>
               ))}
             </select>

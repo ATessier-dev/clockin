@@ -6,7 +6,7 @@ export const profileTranslations: Record<string, Translation> = {
     firstNameLabel: { en: "First name", fr: "Prénom" },
     lastNameLabel: { en: "Last name", fr: "Nom" },
     phoneLabel: { en: "Phone", fr: "Téléphone" },
-    preferredWorkplaceLabel: { en: "Preferred workplace", fr: "Lieu préféré" },
+    preferredPositionLabel: { en: "Preferred position", fr: "Poste préféré" },
     availabilityNoteLabel: { en: "Additional note", fr: "Note additionnelle" },
     localeLabel: { en: "Language", fr: "Langue" },
     save: { en: "Save", fr: "Enregistrer" },

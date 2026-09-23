@@ -10,7 +10,8 @@ import { getTranslation, scheduleCalendarTranslations, type Language } from "@/t
 import type { ShiftListItem } from "./shiftDisplay";
 
 export type EmployeeOption = { id: string; firstName: string; lastName: string };
-export type WorkplaceOption = { id: string; label: string };
+export type WorkplaceOption = { id: string; label: string; color: string };
+export type PositionOption = { id: string; name: string };
 
 const DATETIME_LOCAL_FORMAT = "yyyy-MM-dd'T'HH:mm";
 
@@ -19,6 +20,7 @@ export function shiftToFormDefaults(shift: ShiftListItem) {
     id: shift.id,
     employeeId: shift.employeeId,
     workplaceId: shift.workplaceId,
+    positionId: shift.positionId ?? "",
     startAt: format(shift.startAt, DATETIME_LOCAL_FORMAT),
     endAt: format(shift.endAt, DATETIME_LOCAL_FORMAT),
   };
@@ -28,6 +30,7 @@ export function ShiftForm({
   language,
   employees,
   workplaces,
+  positions,
   initialValues,
   initialDate,
   onCancel,
@@ -37,6 +40,7 @@ export function ShiftForm({
   language: Language;
   employees: EmployeeOption[];
   workplaces: WorkplaceOption[];
+  positions: PositionOption[];
   initialValues?: ReturnType<typeof shiftToFormDefaults>;
   // Only used when creating (no initialValues) — prefills the date from the
   // day card the "+" button was clicked on, with a sensible default time.
@@ -54,6 +58,7 @@ export function ShiftForm({
 
   const [employeeId, setEmployeeId] = useState(initialValues?.employeeId ?? employees[0]?.id ?? "");
   const [workplaceId, setWorkplaceId] = useState(initialValues?.workplaceId ?? workplaces[0]?.id ?? "");
+  const [positionId, setPositionId] = useState(initialValues?.positionId || positions[0]?.id || "");
   const [startAt, setStartAt] = useState(defaultStartAt);
   const [endAt, setEndAt] = useState(defaultEndAt);
   const [error, setError] = useState(false);
@@ -72,6 +77,7 @@ export function ShiftForm({
       body: JSON.stringify({
         employeeId,
         workplaceId,
+        positionId,
         startAt: new Date(startAt).toISOString(),
         endAt: new Date(endAt).toISOString(),
       }),
@@ -135,6 +141,23 @@ export function ShiftForm({
           {workplaces.map((workplace) => (
             <option key={workplace.id} value={workplace.id}>
               {workplace.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="space-y-1">
+        <Label htmlFor="shift-position">{getTranslation(scheduleCalendarTranslations.positionLabel, language)}</Label>
+        <select
+          id="shift-position"
+          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+          value={positionId}
+          onChange={(event) => setPositionId(event.target.value)}
+          required
+        >
+          {positions.map((position) => (
+            <option key={position.id} value={position.id}>
+              {position.name}
             </option>
           ))}
         </select>

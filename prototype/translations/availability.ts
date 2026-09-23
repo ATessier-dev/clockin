@@ -18,4 +18,13 @@ export const availabilityTranslations: Record<string, Translation> = {
     friday: { en: "Friday", fr: "Vendredi" },
     saturday: { en: "Saturday", fr: "Samedi" },
     sunday: { en: "Sunday", fr: "Dimanche" },
+    mondayShort: { en: "Mon", fr: "Lun" },
+    tuesdayShort: { en: "Tue", fr: "Mar" },
+    wednesdayShort: { en: "Wed", fr: "Mer" },
+    thursdayShort: { en: "Thu", fr: "Jeu" },
+    fridayShort: { en: "Fri", fr: "Ven" },
+    saturdayShort: { en: "Sat", fr: "Sam" },
+    sundayShort: { en: "Sun", fr: "Dim" },
+    teamTitle: { en: "Team availability", fr: "Disponibilités de l'équipe" },
+    teamEmpty: { en: "No active employees.", fr: "Aucun employé actif." },
 };
