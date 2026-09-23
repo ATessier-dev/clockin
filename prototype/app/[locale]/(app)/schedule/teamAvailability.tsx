@@ -27,8 +27,12 @@ const DAY_SHORT_LABEL_KEY: Record<DayOfWeek, keyof typeof availabilityTranslatio
 };
 
 export type TeamAvailabilityEmployee = { id: string; firstName: string; lastName: string };
-export type TeamAvailabilityWorkplace = { id: string; color: string };
-export type TeamAvailabilityEntry = { employeeId: string; dayOfWeek: DayOfWeek; workplaceId: string };
+export type TeamAvailabilityWorkplace = { id: string; label: string; color: string };
+export type TeamAvailabilityEntry = {
+  employeeId: string;
+  dayOfWeek: DayOfWeek;
+  workplaceId: string;
+};
 
 export function TeamAvailabilityPanel({
   language,
@@ -43,7 +47,8 @@ export function TeamAvailabilityPanel({
   availabilities: TeamAvailabilityEntry[];
   className?: string;
 }) {
-  const workplaceColor = (workplaceId: string) => workplaces.find((w) => w.id === workplaceId)?.color ?? "#94a3b8";
+  const workplaceColor = (workplaceId: string) =>
+    workplaces.find((w) => w.id === workplaceId)?.color ?? "#94a3b8";
 
   return (
     <Card className={cn("w-full", className)}>
@@ -54,13 +59,32 @@ export function TeamAvailabilityPanel({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {workplaces.length > 0 && (
+          <div className="flex flex-wrap gap-x-3 gap-y-1 border-b border-border pb-3">
+            {workplaces.map((workplace) => (
+              <span
+                key={workplace.id}
+                className="flex items-center gap-1.5 text-xs text-muted-foreground"
+              >
+                <span
+                  className="h-2 w-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: workplace.color }}
+                  aria-hidden="true"
+                />
+                {workplace.label}
+              </span>
+            ))}
+          </div>
+        )}
         {employees.length === 0 ? (
           <p className="text-xs text-muted-foreground">
             {getTranslation(availabilityTranslations.teamEmpty, language)}
           </p>
         ) : (
           employees.map((employee) => {
-            const employeeAvailabilities = availabilities.filter((a) => a.employeeId === employee.id);
+            const employeeAvailabilities = availabilities.filter(
+              (a) => a.employeeId === employee.id
+            );
             return (
               <div key={employee.id} className="space-y-1.5">
                 <p className="text-sm font-medium">
@@ -72,11 +96,17 @@ export function TeamAvailabilityPanel({
                     return (
                       <div key={day} className="flex flex-col items-center gap-1">
                         <span className="text-[10px] uppercase text-muted-foreground">
-                          {getTranslation(availabilityTranslations[DAY_SHORT_LABEL_KEY[day]], language)}
+                          {getTranslation(
+                            availabilityTranslations[DAY_SHORT_LABEL_KEY[day]],
+                            language
+                          )}
                         </span>
                         <div className="flex min-h-[6px] items-center gap-0.5">
                           {dayEntries.length === 0 ? (
-                            <span className="h-1.5 w-1.5 rounded-full bg-muted" aria-hidden="true" />
+                            <span
+                              className="h-1.5 w-1.5 rounded-full bg-muted"
+                              aria-hidden="true"
+                            />
                           ) : (
                             dayEntries.map((entry) => (
                               <span
