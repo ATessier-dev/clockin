@@ -6,13 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getTranslation, postsTranslations, type Language } from "@/translations";
-import type { PostCategoryEntry } from "./editPostItem";
+
+export type PostMediaEntry = {
+  id: string;
+  name: string;
+};
 
 /**
- * Create/edit form for a post category. Renders as a create form when
- * `initialValues` is omitted, or an edit form (with delete) otherwise.
+ * Create/edit form for a post medium (where a text can be posted, e.g.
+ * Reddit or LinkedIn). Renders as a create form when `initialValues` is
+ * omitted, or an edit form (with delete) otherwise.
  */
-export function PostCategoryForm({
+export function PostMediaForm({
   language,
   initialValues,
   onCancel,
@@ -20,7 +25,7 @@ export function PostCategoryForm({
   onDeleted,
 }: {
   language: Language;
-  initialValues?: PostCategoryEntry;
+  initialValues?: PostMediaEntry;
   onCancel: () => void;
   onSaved: () => void;
   onDeleted: () => void;
@@ -36,7 +41,7 @@ export function PostCategoryForm({
     setSubmitting(true);
     setError(false);
 
-    const response = await fetch(isEditing ? `/api/posts/categories/${initialValues!.id}` : "/api/posts/categories", {
+    const response = await fetch(isEditing ? `/api/posts/media/${initialValues!.id}` : "/api/posts/media", {
       method: isEditing ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
@@ -57,7 +62,7 @@ export function PostCategoryForm({
     setSubmitting(true);
     setError(false);
 
-    const response = await fetch(`/api/posts/categories/${initialValues.id}`, { method: "DELETE" });
+    const response = await fetch(`/api/posts/media/${initialValues.id}`, { method: "DELETE" });
 
     setSubmitting(false);
 
@@ -72,8 +77,8 @@ export function PostCategoryForm({
   return (
     <form onSubmit={handleSubmit} className="w-full space-y-3 rounded-lg border border-border bg-card p-4">
       <div className="space-y-1">
-        <Label htmlFor="post-category-name">{getTranslation(postsTranslations.categoryNameLabel, language)}</Label>
-        <Input id="post-category-name" value={name} onChange={(event) => setName(event.target.value)} required autoFocus />
+        <Label htmlFor="post-media-name">{getTranslation(postsTranslations.mediaNameLabel, language)}</Label>
+        <Input id="post-media-name" value={name} onChange={(event) => setName(event.target.value)} required autoFocus />
       </div>
 
       {error && <p className="text-xs text-destructive">{getTranslation(postsTranslations.saveError, language)}</p>}
@@ -82,7 +87,7 @@ export function PostCategoryForm({
         {isEditing && (
           <Button type="button" variant="destructive" size="sm" onClick={handleDelete} disabled={submitting}>
             <Trash2 className="h-4 w-4" aria-hidden="true" />
-            {getTranslation(postsTranslations.deleteCategory, language)}
+            {getTranslation(postsTranslations.deleteMedia, language)}
           </Button>
         )}
         <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={submitting}>

@@ -2,19 +2,17 @@ import { NextResponse } from "next/server";
 import { withPrisma } from "@/lib/withPrisma";
 import { requireSuperuser, UnauthorizedError, ForbiddenError } from "@/lib/auth/requireSession";
 
-/** Deletes a reference document. Superuser only; 404 if it doesn't exist under this item. */
+/** Deletes a reference document. Superuser only; 404 if it doesn't exist under this topic. */
 export async function DELETE(
   request: Request,
-  { params }: RouteContext<"/api/posts/items/[id]/documents/[documentId]">
+  { params }: RouteContext<"/api/posts/topics/[id]/documents/[documentId]">
 ) {
   try {
     await requireSuperuser();
     const { id, documentId } = await params;
 
-    const existing = await withPrisma((prisma) =>
-      prisma.postDocument.findUnique({ where: { id: documentId } })
-    );
-    if (!existing || existing.itemId !== id) {
+    const existing = await withPrisma((prisma) => prisma.postDocument.findUnique({ where: { id: documentId } }));
+    if (!existing || existing.topicId !== id) {
       return NextResponse.json({ error: "not_found" }, { status: 404 });
     }
 

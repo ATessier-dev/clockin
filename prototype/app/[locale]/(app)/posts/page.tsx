@@ -4,9 +4,9 @@ import { type Language } from "@/translations";
 import { PostsView } from "./postsView";
 
 /**
- * Server component: loads post topics/categories and hands them to the
- * client `PostsView`. Open to any employee (unlike topic/category
- * management, generation itself isn't superuser-only).
+ * Server component: loads post media and topics (two independent lists)
+ * and hands them to the client `PostsView`. Open to any employee (unlike
+ * media/topic management, generation itself isn't superuser-only).
  */
 export default async function PostsPage({ params }: {
     params: Promise<{ locale: string }>;
@@ -17,19 +17,19 @@ export default async function PostsPage({ params }: {
     const sessionUser = await getSession();
     if (!sessionUser) return null;
 
-    const [items, categories] = await Promise.all([
+    const [media, topics] = await Promise.all([
+        withPrisma((prisma) => prisma.postMedia.findMany({ orderBy: { sortOrder: "asc" } })),
         withPrisma((prisma) =>
-            prisma.postItem.findMany({
+            prisma.postTopic.findMany({
                 orderBy: { sortOrder: "asc" },
                 select: {
                     id: true,
                     title: true,
-                    categoryId: true,
+                    arturSlug: true,
                     documents: { select: { id: true, filename: true, createdAt: true } },
                 },
             })
         ),
-        withPrisma((prisma) => prisma.postCategory.findMany({ orderBy: { sortOrder: "asc" } })),
     ]);
 
     return (
@@ -37,12 +37,12 @@ export default async function PostsPage({ params }: {
             <PostsView
                 language={language}
                 isSuperuser={sessionUser.role === "SUPERUSER"}
-                categories={categories.map((category) => ({ id: category.id, name: category.name }))}
-                items={items.map((item) => ({
-                    id: item.id,
-                    title: item.title,
-                    categoryId: item.categoryId,
-                    documents: item.documents.map((document) => ({
+                media={media.map((medium) => ({ id: medium.id, name: medium.name }))}
+                topics={topics.map((topic) => ({
+                    id: topic.id,
+                    title: topic.title,
+                    arturSlug: topic.arturSlug,
+                    documents: topic.documents.map((document) => ({
                         id: document.id,
                         filename: document.filename,
                         createdAt: document.createdAt.toISOString(),

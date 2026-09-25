@@ -3,18 +3,18 @@ import { withPrisma } from "@/lib/withPrisma";
 import { requireEmployee, requireSuperuser, UnauthorizedError, ForbiddenError } from "@/lib/auth/requireSession";
 
 // Keeps a single reference document's content well within a reasonable
-// prompt size once it's fed to the LLM alongside the item's other documents.
+// prompt size once it's fed to the LLM alongside the topic's other documents.
 const MAX_DOCUMENT_SIZE_BYTES = 200 * 1024;
 
-/** Lists an item's reference documents (metadata only, no content). Any authenticated employee can read them. */
-export async function GET(request: Request, { params }: RouteContext<"/api/posts/items/[id]/documents">) {
+/** Lists a topic's reference documents (metadata only, no content). Any authenticated employee can read them. */
+export async function GET(request: Request, { params }: RouteContext<"/api/posts/topics/[id]/documents">) {
   try {
     await requireEmployee();
     const { id } = await params;
 
     const documents = await withPrisma((prisma) =>
       prisma.postDocument.findMany({
-        where: { itemId: id },
+        where: { topicId: id },
         orderBy: { createdAt: "asc" },
         select: { id: true, filename: true, createdAt: true },
       })
@@ -30,17 +30,17 @@ export async function GET(request: Request, { params }: RouteContext<"/api/posts
 }
 
 /**
- * Uploads a .txt reference document for a post item. Superuser only.
+ * Uploads a .txt reference document for a post topic. Superuser only.
  * Rejects anything that isn't a plain-text file under the size cap, since
  * the content is passed to the LLM as-is.
  */
-export async function POST(request: Request, { params }: RouteContext<"/api/posts/items/[id]/documents">) {
+export async function POST(request: Request, { params }: RouteContext<"/api/posts/topics/[id]/documents">) {
   try {
     await requireSuperuser();
     const { id } = await params;
 
-    const item = await withPrisma((prisma) => prisma.postItem.findUnique({ where: { id } }));
-    if (!item) {
+    const topic = await withPrisma((prisma) => prisma.postTopic.findUnique({ where: { id } }));
+    if (!topic) {
       return NextResponse.json({ error: "not_found" }, { status: 404 });
     }
 
@@ -59,7 +59,7 @@ export async function POST(request: Request, { params }: RouteContext<"/api/post
 
     const document = await withPrisma((prisma) =>
       prisma.postDocument.create({
-        data: { itemId: id, filename: file.name, content },
+        data: { topicId: id, filename: file.name, content },
         select: { id: true, filename: true, createdAt: true },
       })
     );

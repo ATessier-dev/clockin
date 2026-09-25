@@ -13,40 +13,34 @@ export type PostDocumentEntry = {
   createdAt: string;
 };
 
-export type PostItemEntry = {
+export type PostTopicEntry = {
   id: string;
   title: string;
-  categoryId: string | null;
+  arturSlug: string | null;
   documents: PostDocumentEntry[];
 };
 
-export type PostCategoryEntry = {
-  id: string;
-  name: string;
-};
-
 /**
- * Create/edit form for a post item (title, category), plus, once the item
- * exists, its .txt reference documents (list with delete, upload input).
- * Document uploads apply immediately and don't require submitting the form.
+ * Create/edit form for a post topic (title), plus, once the topic exists,
+ * its .txt reference documents (list with delete, upload input). A topic
+ * isn't tied to any one medium: the same topic can later be generated for
+ * several. Document uploads apply immediately and don't require submitting
+ * the form.
  */
-export function PostItemForm({
+export function PostTopicForm({
   language,
   initialValues,
-  categories,
   onCancel,
   onSaved,
   onDeleted,
 }: {
   language: Language;
-  initialValues?: PostItemEntry;
-  categories: PostCategoryEntry[];
+  initialValues?: PostTopicEntry;
   onCancel: () => void;
   onSaved: () => void;
   onDeleted: () => void;
 }) {
   const [title, setTitle] = useState(initialValues?.title ?? "");
-  const [categoryId, setCategoryId] = useState(initialValues?.categoryId ?? "");
   const [documents, setDocuments] = useState<PostDocumentEntry[]>(initialValues?.documents ?? []);
   const [error, setError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
@@ -61,10 +55,10 @@ export function PostItemForm({
     setSubmitting(true);
     setError(false);
 
-    const response = await fetch(isEditing ? `/api/posts/items/${initialValues!.id}` : "/api/posts/items", {
+    const response = await fetch(isEditing ? `/api/posts/topics/${initialValues!.id}` : "/api/posts/topics", {
       method: isEditing ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, categoryId: categoryId || null }),
+      body: JSON.stringify({ title }),
     });
 
     setSubmitting(false);
@@ -82,7 +76,7 @@ export function PostItemForm({
     setSubmitting(true);
     setError(false);
 
-    const response = await fetch(`/api/posts/items/${initialValues.id}`, { method: "DELETE" });
+    const response = await fetch(`/api/posts/topics/${initialValues.id}`, { method: "DELETE" });
 
     setSubmitting(false);
 
@@ -105,7 +99,7 @@ export function PostItemForm({
     const formData = new FormData();
     formData.set("file", file);
 
-    const response = await fetch(`/api/posts/items/${initialValues.id}/documents`, {
+    const response = await fetch(`/api/posts/topics/${initialValues.id}/documents`, {
       method: "POST",
       body: formData,
     });
@@ -125,7 +119,7 @@ export function PostItemForm({
     if (!initialValues) return;
     setDocumentError(false);
 
-    const response = await fetch(`/api/posts/items/${initialValues.id}/documents/${documentId}`, {
+    const response = await fetch(`/api/posts/topics/${initialValues.id}/documents/${documentId}`, {
       method: "DELETE",
     });
 
@@ -140,25 +134,8 @@ export function PostItemForm({
   return (
     <form onSubmit={handleSubmit} className="w-full space-y-3 rounded-lg border border-border bg-card p-4">
       <div className="space-y-1">
-        <Label htmlFor="post-item-title">{getTranslation(postsTranslations.titleLabel, language)}</Label>
-        <Input id="post-item-title" value={title} onChange={(event) => setTitle(event.target.value)} required autoFocus />
-      </div>
-
-      <div className="space-y-1">
-        <Label htmlFor="post-item-category">{getTranslation(postsTranslations.categoryLabel, language)}</Label>
-        <select
-          id="post-item-category"
-          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-          value={categoryId}
-          onChange={(event) => setCategoryId(event.target.value)}
-        >
-          <option value="">{getTranslation(postsTranslations.noCategoryOption, language)}</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
+        <Label htmlFor="post-topic-title">{getTranslation(postsTranslations.titleLabel, language)}</Label>
+        <Input id="post-topic-title" value={title} onChange={(event) => setTitle(event.target.value)} required autoFocus />
       </div>
 
       {error && <p className="text-xs text-destructive">{getTranslation(postsTranslations.saveError, language)}</p>}

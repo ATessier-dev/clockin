@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 import { withPrisma } from "@/lib/withPrisma";
 import { requireSuperuser, UnauthorizedError, ForbiddenError } from "@/lib/auth/requireSession";
 
-/** Renames a post category. Superuser only; 404 if the category doesn't exist. */
-export async function PATCH(request: Request, { params }: RouteContext<"/api/posts/categories/[id]">) {
+/** Renames a post medium. Superuser only; 404 if it doesn't exist. */
+export async function PATCH(request: Request, { params }: RouteContext<"/api/posts/media/[id]">) {
   try {
     await requireSuperuser();
     const { id } = await params;
 
-    const existing = await withPrisma((prisma) => prisma.postCategory.findUnique({ where: { id } }));
+    const existing = await withPrisma((prisma) => prisma.postMedia.findUnique({ where: { id } }));
     if (!existing) {
       return NextResponse.json({ error: "not_found" }, { status: 404 });
     }
@@ -20,9 +20,9 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/pos
       return NextResponse.json({ error: "invalid_body" }, { status: 400 });
     }
 
-    const category = await withPrisma((prisma) => prisma.postCategory.update({ where: { id }, data: { name } }));
+    const medium = await withPrisma((prisma) => prisma.postMedia.update({ where: { id }, data: { name } }));
 
-    return NextResponse.json({ category });
+    return NextResponse.json({ medium });
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -34,19 +34,20 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/pos
   }
 }
 
-// Deleting a category never deletes its items. PostItem.categoryId is
-// onDelete: SetNull, so items simply become uncategorized.
-export async function DELETE(request: Request, { params }: RouteContext<"/api/posts/categories/[id]">) {
+// Deleting a medium cascades to its PostGeneration rows (see their
+// onDelete: Cascade): a generation without the medium it was written for
+// no longer means anything on its own.
+export async function DELETE(request: Request, { params }: RouteContext<"/api/posts/media/[id]">) {
   try {
     await requireSuperuser();
     const { id } = await params;
 
-    const existing = await withPrisma((prisma) => prisma.postCategory.findUnique({ where: { id } }));
+    const existing = await withPrisma((prisma) => prisma.postMedia.findUnique({ where: { id } }));
     if (!existing) {
       return NextResponse.json({ error: "not_found" }, { status: 404 });
     }
 
-    await withPrisma((prisma) => prisma.postCategory.delete({ where: { id } }));
+    await withPrisma((prisma) => prisma.postMedia.delete({ where: { id } }));
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
