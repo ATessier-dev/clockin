@@ -78,6 +78,7 @@ model Employee {
   editedClockEvents   ClockEvent[]  @relation("EditedByEmployee")
   completedChecklistItems ChecklistItem[] @relation("ChecklistCompletedBy")
   availabilities      EmployeeAvailability[]
+  postGenerations     PostGeneration[]
 
   @@map("employees")
 }
@@ -316,4 +317,73 @@ model ChecklistItem {
 
   @@index([categoryId])
   @@map("checklist_items")
+}
+
+/// Groups PostItems for display (one card per category on the /posts
+/// page), exactly like ChecklistCategory. Only a superuser can create,
+/// rename, or delete categories. Deleting a category never deletes its
+/// items; they fall back to "uncategorized" (see PostItem.categoryId's
+/// onDelete: SetNull).
+model PostCategory {
+  id        String     @id @default(cuid())
+  name      String
+  sortOrder Int        @default(0) @map("sort_order")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  items     PostItem[]
+
+  @@map("post_categories")
+}
+
+/// A topic to promote on social media. Superuser-managed. Reference
+/// documents (the grounding source for the LLM) and the generation
+/// history live below it.
+model PostItem {
+  id          String           @id @default(cuid())
+  title       String
+  categoryId  String?          @map("category_id")
+  category    PostCategory?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  sortOrder   Int              @default(0) @map("sort_order")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  documents   PostDocument[]
+  generations PostGeneration[]
+
+  @@index([categoryId])
+  @@map("post_items")
+}
+
+/// A .txt reference document imported for a PostItem, used as grounding
+/// context by the LLM. Content is stored as-is; no external file storage,
+/// this project has no blob storage infrastructure.
+model PostDocument {
+  id        String   @id @default(cuid())
+  itemId    String   @map("item_id")
+  item      PostItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  filename  String
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([itemId])
+  @@map("post_documents")
+}
+
+/// A text an employee generated, optionally edited, and explicitly saved
+/// for an item (a plain "generate" doesn't land here until saved; see
+/// app/api/posts/items/[id]/generate/route.ts). Doubles as the copy-paste
+/// display and as anti-repetition context fed back into the next
+/// generation for the same item.
+model PostGeneration {
+  id                  String         @id @default(cuid())
+  itemId              String         @map("item_id")
+  item                PostItem       @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  content             String         @db.Text
+  createdByEmployeeId String         @map("created_by_employee_id")
+  createdByEmployee   Employee       @relation(fields: [createdByEmployeeId], references: [id])
+  createdAt           DateTime       @default(now()) @map("created_at")
+
+  @@index([itemId, createdAt])
+  @@map("post_generations")
 }

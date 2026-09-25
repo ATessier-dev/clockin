@@ -16,6 +16,7 @@ const navItems = [
     { href: "/dashboard", key: "dashboard" },
     { href: "/schedule", key: "schedule" },
     { href: "/checklist", key: "checklist" },
+    { href: "/posts", key: "posts" },
 ] as const;
 
 const superuserNavItems = [
