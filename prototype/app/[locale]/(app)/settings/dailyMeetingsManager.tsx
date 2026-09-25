@@ -18,6 +18,11 @@ export type DailyMeetingListEntry = DailyMeetingEntry & {
   workplace: { label: string; color: string };
 };
 
+/**
+ * Lists configured daily meetings and toggles the inline create/edit form.
+ * `formMode` holds "create", the meeting being edited, or null; reusing the
+ * entry itself avoids a second lookup when switching to edit mode.
+ */
 export function DailyMeetingsManager({
   language,
   dailyMeetings,

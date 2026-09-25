@@ -1,5 +1,7 @@
 import type { Translation } from "./types";
 
+// Strings for the dashboard page widgets: the employee info card, the
+// upcoming shift card, the page title, and the current shift status card.
 export const employeeCardTranslations: Record<string, Translation> = {
     title: {en: 'Personnal informations', fr: 'Informations personnelles'},
     nameLabel : {en: 'Hi', fr: 'Bonjour'},

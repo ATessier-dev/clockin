@@ -29,6 +29,11 @@ const trailingNavItems = [
     { href: "/doc", key: "doc" },
 ] as const;
 
+/**
+ * Server-rendered top navbar. Resolves the session and picks the nav links
+ * to show (superuser gets extra management links); renders nothing when
+ * there's no session, since the layout will redirect anyway.
+ */
 export default async function Navbar() {
     const [sessionUser, locale] = await Promise.all([getSession(), getLocale()]);
     const language = locale as Language;
@@ -40,6 +45,8 @@ export default async function Navbar() {
             ? [...navItems, ...superuserNavItems, ...trailingNavItems]
             : [...navItems, ...trailingNavItems];
 
+    // findUniqueOrThrow is safe here: a valid session implies its employeeId
+    // still exists, so a miss means corrupted session state worth surfacing.
     const employee = await withPrisma((prisma) =>
         prisma.employee.findUniqueOrThrow({
             where: { id: sessionUser.employeeId },

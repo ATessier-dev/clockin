@@ -1,5 +1,7 @@
 import type { Translation } from "./types";
 
+// Strings for the main navigation bar: links, greeting, and actions
+// (logout, language switch).
 export const navbarTranslations: Record<string, Translation> = {
     greetings: {en: 'Hi', fr: 'Bonjour'},
     dashboard: { en: "Dashboard", fr: "Tableau de bord" },

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { withPrisma } from "@/lib/withPrisma";
 import { requireSuperuser, UnauthorizedError, ForbiddenError } from "@/lib/auth/requireSession";
 
+/** Renames a doc category. Superuser only; 404 if the category doesn't exist. */
 export async function PATCH(request: Request, { params }: RouteContext<"/api/doc/categories/[id]">) {
   try {
     await requireSuperuser();

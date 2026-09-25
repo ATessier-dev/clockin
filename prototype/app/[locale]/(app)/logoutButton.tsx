@@ -11,6 +11,8 @@ export function LogoutButton({ language }: { language: Language }) {
   const [loading, setLoading] = useState(false);
 
   async function handleLogout() {
+    // Never reset to false: the button stays disabled until navigation to
+    // /login unmounts it, so there's no "logged out but still clickable" state.
     setLoading(true);
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");

@@ -22,6 +22,7 @@ function isUniqueConstraintViolation(error: unknown): boolean {
   );
 }
 
+/** Lists all employees (active first). Superuser only. */
 export async function GET() {
   try {
     await requireSuperuser();
@@ -45,6 +46,7 @@ export async function GET() {
   }
 }
 
+/** Creates an employee. Superuser only; returns 409 if the login code is already taken. */
 export async function POST(request: Request) {
   try {
     await requireSuperuser();

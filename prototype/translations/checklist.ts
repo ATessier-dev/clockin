@@ -1,5 +1,7 @@
 import type { Translation } from "./types";
 
+// Strings for the shift checklist feature: tasks (with recurrence) grouped
+// into categories.
 export const checklistTranslations: Record<string, Translation> = {
     title: { en: "Checklist", fr: "Liste de tâches" },
     addTask: { en: "Add a task", fr: "Ajouter une tâche" },

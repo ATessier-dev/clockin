@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { withPrisma } from "@/lib/withPrisma";
 import { requireSuperuser, UnauthorizedError, ForbiddenError } from "@/lib/auth/requireSession";
 
+/** Updates a doc link's fields. Superuser only; 404 if the link doesn't exist. */
 export async function PATCH(request: Request, { params }: RouteContext<"/api/doc/links/[id]">) {
   try {
     await requireSuperuser();
@@ -49,6 +50,7 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/doc
   }
 }
 
+/** Deletes a doc link. Superuser only; 404 if the link doesn't exist. */
 export async function DELETE(request: Request, { params }: RouteContext<"/api/doc/links/[id]">) {
   try {
     await requireSuperuser();

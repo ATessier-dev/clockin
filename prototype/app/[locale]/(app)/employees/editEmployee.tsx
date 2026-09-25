@@ -21,6 +21,11 @@ export type EmployeeEntry = {
 
 export type WorkplaceOption = { id: string; label: string };
 
+/**
+ * Superuser-only create/edit form for an employee. Renders as a create
+ * form (with an auto-suggested employee code) when `initialValues` is
+ * omitted, or an edit form (with activate/deactivate) otherwise.
+ */
 export function EmployeeForm({
   language,
   workplaces,
@@ -92,6 +97,8 @@ export function EmployeeForm({
       method: isEditing ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        // Omit the code when editing and unchanged so the API doesn't run
+        // its uniqueness check against the employee's own current code.
         code: isEditing ? (code !== initialValues!.code ? code : undefined) : code,
         firstName,
         lastName,
@@ -112,6 +119,8 @@ export function EmployeeForm({
     setSubmitting(true);
     setError(null);
 
+    // DELETE deactivates rather than removing the record, so history/shifts
+    // tied to this employee stay intact; reactivating is a plain PATCH.
     const response = initialValues.active
       ? await fetch(`/api/employees/${initialValues.id}`, { method: "DELETE" })
       : await fetch(`/api/employees/${initialValues.id}`, {

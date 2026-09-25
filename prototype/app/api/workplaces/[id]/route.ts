@@ -11,6 +11,7 @@ const WORKPLACE_SELECT = {
 
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
 
+/** Updates a workplace's fields. Superuser only; 404 if the workplace doesn't exist. */
 export async function PATCH(request: Request, { params }: RouteContext<"/api/workplaces/[id]">) {
   try {
     await requireSuperuser();

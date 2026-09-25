@@ -17,6 +17,7 @@ export type ShiftListItem = {
     position: { name: string; color: string } | null;
 };
 
+/** Renders a list of shift cards; `renderActions` lets the caller add per-shift buttons (e.g. edit) without this component knowing about permissions. */
 export function ShiftDisplay({
     shiftList,
     renderActions,

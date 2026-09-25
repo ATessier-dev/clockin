@@ -4,6 +4,7 @@ import { requireSuperuser, UnauthorizedError, ForbiddenError } from "@/lib/auth/
 
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
 
+/** Updates a position's name/color. Superuser only; 404 if the position doesn't exist. */
 export async function PATCH(request: Request, { params }: RouteContext<"/api/positions/[id]">) {
   try {
     await requireSuperuser();

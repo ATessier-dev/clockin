@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withPrisma } from "@/lib/withPrisma";
 import { requireEmployee, requireSuperuser, UnauthorizedError, ForbiddenError } from "@/lib/auth/requireSession";
 
+/** Lists gallery events, optionally overlapping a given date window. Any authenticated employee can read them. */
 export async function GET(request: NextRequest) {
   try {
     await requireEmployee();
@@ -34,6 +35,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/** Creates a gallery event. Superuser only; 400 if end is not after start. */
 export async function POST(request: Request) {
   try {
     await requireSuperuser();

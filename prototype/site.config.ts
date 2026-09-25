@@ -1,3 +1,4 @@
+// Site-wide metadata (page title/description in app/[locale]/layout.tsx).
 type SiteConfig = {
   site_domain: string;
   site_name: string;

@@ -31,6 +31,7 @@ function slugify(value: string): string {
   );
 }
 
+/** Lists workplaces alphabetically by label. Superuser only. */
 export async function GET() {
   try {
     await requireSuperuser();
@@ -51,6 +52,7 @@ export async function GET() {
   }
 }
 
+/** Creates a workplace, deriving a unique internal slug from its label. Superuser only. */
 export async function POST(request: Request) {
   try {
     await requireSuperuser();
@@ -71,6 +73,9 @@ export async function POST(request: Request) {
 
     const baseKey = slugify(label);
     let workplace;
+    // Bounded retry on a slug collision (e.g. two workplaces sharing a
+    // label): appends an incrementing suffix rather than failing the
+    // request outright, but gives up after a few attempts either way.
     for (let attempt = 0; ; attempt += 1) {
       const key = attempt === 0 ? baseKey : `${baseKey}-${attempt + 1}`;
       try {

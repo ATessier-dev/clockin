@@ -21,6 +21,7 @@ function parseDays(value: unknown): DayOfWeek[] | null {
   return days.every((day): day is DayOfWeek => DAYS_OF_WEEK.includes(day as DayOfWeek)) ? days : null;
 }
 
+/** Updates a daily meeting's schedule. Superuser only; 404 if the meeting doesn't exist. */
 export async function PATCH(request: Request, { params }: RouteContext<"/api/daily-meetings/[id]">) {
   try {
     await requireSuperuser();
@@ -67,6 +68,7 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/dai
   }
 }
 
+/** Deletes a daily meeting. Superuser only; 404 if the meeting doesn't exist. */
 export async function DELETE(request: Request, { params }: RouteContext<"/api/daily-meetings/[id]">) {
   try {
     await requireSuperuser();

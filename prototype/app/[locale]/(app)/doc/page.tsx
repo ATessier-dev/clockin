@@ -3,6 +3,10 @@ import { withPrisma } from '@/lib/withPrisma';
 import { type Language } from '@/translations';
 import { DocView } from './docView';
 
+/**
+ * Server component: loads documentation categories/links and hands them
+ * to the client `DocView`.
+ */
 export default async function DocPage({ params }: {
     params: Promise<{ locale: string }>;
 }) {

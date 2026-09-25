@@ -8,6 +8,10 @@ import { Label } from "@/components/ui/label";
 import { getTranslation, checklistTranslations, type Language } from "@/translations";
 import type { ChecklistCategoryEntry } from "./editChecklistItem";
 
+/**
+ * Create/edit form for a checklist category. Renders as a create form when
+ * `initialValues` is omitted, or an edit form (with delete) otherwise.
+ */
 export function ChecklistCategoryForm({
   language,
   initialValues,

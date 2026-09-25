@@ -22,6 +22,7 @@ export type GalleryEventEntry = {
 
 const DATETIME_LOCAL_FORMAT = "yyyy-MM-dd'T'HH:mm";
 
+/** Converts a persisted gallery event into the string-typed defaults the edit form's inputs need. */
 export function galleryEventToFormDefaults(event: GalleryEventEntry) {
   return {
     id: event.id,
@@ -33,6 +34,10 @@ export function galleryEventToFormDefaults(event: GalleryEventEntry) {
   };
 }
 
+/**
+ * Create/edit form for a gallery event. `initialValues` presence switches
+ * it between POST (create) and PATCH/DELETE (edit) against the events API.
+ */
 export function GalleryEventForm({
   language,
   workplaces,
@@ -78,6 +83,8 @@ export function GalleryEventForm({
     setSubmitting(false);
 
     if (!response.ok) {
+      // The API returns a specific error code for this one validation case
+      // so the form can show a targeted message instead of a generic failure.
       const data = (await response.json().catch(() => null)) as { error?: string } | null;
       setError(
         data?.error === "end_before_start"

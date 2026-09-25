@@ -14,6 +14,10 @@ export type WorkplaceEntry = {
   color: string;
 };
 
+/**
+ * Create/edit form for a workplace. `initialValues` presence selects
+ * create (POST) vs edit (PATCH) mode.
+ */
 export function WorkplaceForm({
   language,
   initialValues,
@@ -67,6 +71,9 @@ export function WorkplaceForm({
     setSubmitting(false);
 
     if (!response.ok) {
+      // A workplace still referenced by clock events or shifts can't be
+      // deleted; the API reports that specifically as `{ error: "in_use" }`
+      // so this can show a more helpful message than the generic one.
       const data = (await response.json().catch(() => null)) as { error?: string } | null;
       setError(
         data?.error === "in_use"

@@ -4,6 +4,10 @@ import { redirect } from '@/i18n/navigation';
 import { type Language } from '@/translations';
 import { EmployeesView } from './employeesView';
 
+/**
+ * Server component: superuser-only employee directory. Redirects other
+ * roles to the dashboard before loading any data.
+ */
 export default async function EmployeesPage({ params }: {
     params: Promise<{ locale: string }>;
 }) {

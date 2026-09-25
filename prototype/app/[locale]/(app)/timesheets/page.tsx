@@ -7,6 +7,11 @@ import { TimesheetsView } from './timesheetsView';
 import { ActiveStatusCard, type ActiveEmployee } from './activeStatus';
 import { ExpectedStatusCard, type ExpectedEmployee } from './expectedStatus';
 
+/**
+ * Timesheets page, superuser only (redirects other roles to /dashboard).
+ * Computes who is currently clocked in vs. who is scheduled right now, and
+ * loads one employee's clock events for the selected day.
+ */
 export default async function TimesheetsPage({ params, searchParams }: {
     params: Promise<{ locale: string }>;
     searchParams: Promise<{ employeeId?: string; day?: string }>;
@@ -91,6 +96,7 @@ export default async function TimesheetsPage({ params, searchParams }: {
 
     const selectedEmployeeId = employeeId ?? employees[0]?.id ?? "";
 
+    // Fall back to today if the `day` query param is missing or unparsable.
     const requestedDate = day ? new Date(day) : new Date();
     const referenceDate = Number.isNaN(requestedDate.getTime()) ? new Date() : requestedDate;
     const dayStart = startOfDay(referenceDate);

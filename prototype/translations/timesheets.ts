@@ -1,5 +1,7 @@
 import type { Translation } from "./types";
 
+// Strings for the timesheets page: clock event log, active/expected shift
+// status widgets, and per-day navigation.
 export const timesheetsTranslations: Record<string, Translation> = {
     title: { en: "Timesheets", fr: "Feuilles de temps" },
     selectEmployee: { en: "Employee", fr: "Employé" },

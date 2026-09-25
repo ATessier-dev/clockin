@@ -7,6 +7,7 @@ import {
   ForbiddenError,
 } from "@/lib/auth/requireSession";
 
+/** Fetches a single shift by id. Any authenticated employee can read it. */
 export async function GET(
   request: Request,
   { params }: RouteContext<"/api/shifts/[id]">
@@ -30,6 +31,7 @@ export async function GET(
   }
 }
 
+/** Updates a shift's assignment or time range. Superuser only; 400 if end is not after start. */
 export async function PATCH(
   request: Request,
   { params }: RouteContext<"/api/shifts/[id]">
@@ -89,6 +91,7 @@ export async function PATCH(
   }
 }
 
+/** Deletes a shift. Superuser only; 404 if the shift doesn't exist. */
 export async function DELETE(
   request: Request,
   { params }: RouteContext<"/api/shifts/[id]">

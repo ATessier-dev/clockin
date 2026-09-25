@@ -4,6 +4,7 @@ import { requireEmployee, requireSuperuser, UnauthorizedError, ForbiddenError } 
 
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
 
+/** Lists positions in display order. Any authenticated employee can read them. */
 export async function GET() {
   try {
     await requireEmployee();
@@ -21,6 +22,7 @@ export async function GET() {
   }
 }
 
+/** Creates a position appended at the end of the sort order. Superuser only. */
 export async function POST(request: Request) {
   try {
     await requireSuperuser();

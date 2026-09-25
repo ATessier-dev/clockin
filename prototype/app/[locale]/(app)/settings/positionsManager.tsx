@@ -9,6 +9,10 @@ import { PageHeading } from "@/components/ui/pageHeading";
 import { getTranslation, positionsTranslations, type Language } from "@/translations";
 import { PositionForm, type PositionEntry } from "./editPosition";
 
+/**
+ * Lists configured positions and toggles the inline create/edit form.
+ * `formMode` holds "create", the position being edited, or null.
+ */
 export function PositionsManager({
   language,
   positions,

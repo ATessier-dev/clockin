@@ -11,6 +11,7 @@ export type UpcomingShift = {
   workplace: { label: string; color: string } | null;
 } | null;
 
+/** Displays the employee's next scheduled shift, or an empty state if none. */
 export function UpcomingShiftCard({ language, shift }: { language: Language; shift: UpcomingShift }) {
   const dateLocale = dateLocales[language];
 

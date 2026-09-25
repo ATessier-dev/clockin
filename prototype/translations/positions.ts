@@ -1,5 +1,6 @@
 import type { Translation } from "./types";
 
+// Strings for managing job positions (name, color).
 export const positionsTranslations: Record<string, Translation> = {
     title: { en: "Positions", fr: "Postes" },
     addPosition: { en: "Add a position", fr: "Ajouter un poste" },

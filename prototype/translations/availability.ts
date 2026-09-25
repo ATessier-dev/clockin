@@ -1,5 +1,7 @@
 import type { Translation } from "./types";
 
+// Strings for the availability page: weekly day picker for an employee's
+// own availability, plus the manager-facing team availability view.
 export const availabilityTranslations: Record<string, Translation> = {
     title: { en: "Availability", fr: "Disponibilités" },
     hours: { en: "11am - 6pm", fr: "11h - 18h" },

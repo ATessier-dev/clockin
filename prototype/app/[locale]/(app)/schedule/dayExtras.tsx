@@ -27,12 +27,15 @@ const DAY_OF_WEEK_BY_INDEX: DayOfWeek[] = [
   "SATURDAY",
 ];
 
+// Compares full day boundaries rather than exact dates so multi-day events
+// (startAt and endAt on different days) show up on every day they span.
 function eventOverlapsDay(event: GalleryEventEntry, day: Date): boolean {
   const dayStart = startOfDay(day);
   const dayEnd = endOfDay(day);
   return event.startAt <= dayEnd && event.endAt >= dayStart;
 }
 
+/** Renders the daily meetings and gallery events attached to a given schedule day, if any. */
 export function DayExtras({
   language,
   day,

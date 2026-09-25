@@ -1,5 +1,6 @@
 import type { Translation } from "./types";
 
+// Strings for managing workplaces (name, description, color).
 export const workplacesTranslations: Record<string, Translation> = {
     title: { en: "Workplaces", fr: "Lieux de travail" },
     addWorkplace: { en: "Add a workplace", fr: "Ajouter un lieu" },

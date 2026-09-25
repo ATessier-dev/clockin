@@ -1,5 +1,7 @@
 import type { Translation } from "./types";
 
+// Strings for the employee management page: list, add/edit form, and
+// activate/deactivate actions.
 export const employeesTranslations: Record<string, Translation> = {
     title: { en: "Employees", fr: "Employés" },
     addEmployee: { en: "Add an employee", fr: "Ajouter un employé" },

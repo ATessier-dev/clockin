@@ -34,6 +34,10 @@ export type TeamAvailabilityEntry = {
   workplaceId: string;
 };
 
+/**
+ * Superuser-only panel summarizing each employee's weekly availability as a
+ * row of dots per day, one dot per workplace they're available at.
+ */
 export function TeamAvailabilityPanel({
   language,
   employees,

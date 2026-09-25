@@ -1,5 +1,7 @@
 import type { Translation } from "./types";
 
+// Strings for the documentation links page: categories and links (title,
+// URL, description).
 export const docTranslations: Record<string, Translation> = {
     title: { en: "Docs", fr: "Docs" },
     addCategory: { en: "Add a category", fr: "Ajouter une catégorie" },

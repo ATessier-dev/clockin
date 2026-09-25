@@ -28,6 +28,8 @@ async function main() {
     },
   });
 
+  // Position.name has no unique constraint (unlike Workplace.key), so this
+  // can't be an upsert; check first to keep the seed idempotent.
   const existingGalleristePosition = await prisma.position.findFirst({ where: { name: "Galeriste" } });
   if (!existingGalleristePosition) {
     await prisma.position.create({ data: { name: "Galeriste", color: "#0ea5e9", sortOrder: 0 } });

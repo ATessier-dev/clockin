@@ -4,6 +4,11 @@ import { withPrisma } from '@/lib/withPrisma';
 import { type Language } from '@/translations';
 import { ScheduleWeek } from './scheduleWeek';
 
+/**
+ * Server-rendered week view of the schedule. Loads the signed-in employee's
+ * own shifts always, and the full roster/catalogs/team availability only
+ * for superusers, since employees can't act on that data anyway.
+ */
 export default async function SchedulePage({params, searchParams} : {
     params: Promise<{locale: string}>;
     searchParams: Promise<{ week?: string }>;
@@ -16,6 +21,8 @@ export default async function SchedulePage({params, searchParams} : {
     const isSuperuser = sessionUser.role === "SUPERUSER";
 
     const requestedDate = week ? new Date(week) : new Date();
+    // Guard against a malformed or tampered `week` query param falling back
+    // to an Invalid Date, which would break every date computation below.
     const referenceDate = Number.isNaN(requestedDate.getTime()) ? new Date() : requestedDate;
     const weekStart = startOfWeek(referenceDate, { weekStartsOn: 1 });
     const weekEnd = endOfWeek(referenceDate, { weekStartsOn: 1 });
@@ -42,6 +49,8 @@ export default async function SchedulePage({params, searchParams} : {
         })
     );
 
+    // Skip these queries entirely for regular employees; they're only used
+    // by the superuser-only shift form and team availability panel.
     const [employees, workplaces, positions, teamAvailabilities] = isSuperuser
         ? await Promise.all([
               withPrisma((prisma) =>
