@@ -12,6 +12,11 @@ export type DocCategoryEntry = {
   name: string;
 };
 
+/**
+ * Create/edit form for a documentation link category. Renders as a create
+ * form when `initialValues` is omitted, or an edit form (with delete)
+ * otherwise.
+ */
 export function DocCategoryForm({
   language,
   initialValues,

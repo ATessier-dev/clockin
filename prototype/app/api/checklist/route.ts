@@ -5,6 +5,7 @@ import { isEffectivelyCompleted, type ChecklistRecurrence } from "@/lib/checklis
 
 const RECURRENCES: ChecklistRecurrence[] = ["ONE_TIME", "DAILY", "WEEKLY", "MONTHLY"];
 
+/** Lists checklist items with their effective completion state for the current recurrence cycle. */
 export async function GET() {
   try {
     await requireEmployee();
@@ -35,6 +36,7 @@ export async function GET() {
   }
 }
 
+/** Creates a checklist item appended at the end of the sort order. Superuser only. */
 export async function POST(request: Request) {
   try {
     await requireSuperuser();

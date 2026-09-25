@@ -1,5 +1,6 @@
 import type { Translation } from "./types";
 
+// Strings for calendar events (add/edit/delete) shown on the schedule.
 export const eventsTranslations: Record<string, Translation> = {
     addEvent: { en: "Add an event", fr: "Ajouter un événement" },
     editEvent: { en: "Edit", fr: "Modifier" },

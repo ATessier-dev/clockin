@@ -86,6 +86,7 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/che
   }
 }
 
+/** Deletes a checklist item. Superuser only; 404 if the item doesn't exist. */
 export async function DELETE(request: Request, { params }: RouteContext<"/api/checklist/[id]">) {
   try {
     await requireSuperuser();

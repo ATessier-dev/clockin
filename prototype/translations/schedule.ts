@@ -1,5 +1,7 @@
 import type { Translation } from "./types";
 
+// Strings for the schedule calendar page: shifts (add/edit/delete), week
+// navigation, and the copy-week feature.
 export const scheduleCalendarTranslations: Record<string, Translation> = {
     week: { en: "Week", fr: "Semaine" },
     today: { en: "Today", fr: "Aujourd'hui" },

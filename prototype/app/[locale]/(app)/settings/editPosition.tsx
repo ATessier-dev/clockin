@@ -13,6 +13,10 @@ export type PositionEntry = {
   color: string;
 };
 
+/**
+ * Create/edit form for a position. `initialValues` presence selects
+ * create (POST) vs edit (PATCH) mode.
+ */
 export function PositionForm({
   language,
   initialValues,

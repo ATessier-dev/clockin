@@ -4,6 +4,12 @@ import { getTranslation, myShiftStatusTranslations, type Language } from "@/tran
 
 export type MyShiftNow = { workplace: { label: string; color: string } | null } | null;
 
+/**
+ * Compares the employee's actual clock state (`isClockedIn`) against
+ * whether they currently have a shift scheduled (`shiftNow`): a check
+ * mark means both agree, a warning means they're scheduled but not
+ * clocked in.
+ */
 export function MyExpectedStatusCard({
   language,
   isClockedIn,

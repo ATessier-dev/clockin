@@ -7,6 +7,7 @@ import {
   ForbiddenError,
 } from "@/lib/auth/requireSession";
 
+/** Lists shifts, optionally filtered by employee, workplace, and/or date range. Any authenticated employee can read them. */
 export async function GET(request: NextRequest) {
   try {
     await requireEmployee();
@@ -47,6 +48,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/** Creates a shift. Superuser only; 400 if end is not after start. */
 export async function POST(request: Request) {
   try {
     await requireSuperuser();

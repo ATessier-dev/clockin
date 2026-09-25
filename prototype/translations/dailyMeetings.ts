@@ -1,5 +1,6 @@
 import type { Translation } from "./types";
 
+// Strings for managing recurring daily meetings (name, time, days, workplace).
 export const dailyMeetingsTranslations: Record<string, Translation> = {
     title: { en: "Daily meetings", fr: "Réunions journalières" },
     addMeeting: { en: "Add a meeting", fr: "Ajouter une réunion" },

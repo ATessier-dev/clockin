@@ -30,10 +30,16 @@ const DAY_LABEL_KEY: Record<DayOfWeek, keyof typeof availabilityTranslations> = 
   SUNDAY: "sunday",
 };
 
+// Encodes a (day, workplace) pair into a single string so selection state
+// can live in a flat Set instead of a nested day -> workplace structure.
 function toKey(dayOfWeek: DayOfWeek, workplaceId: string): string {
   return `${dayOfWeek}:${workplaceId}`;
 }
 
+/**
+ * Weekly availability picker: a workplace toggle per day, backed by a flat
+ * Set of "day:workplaceId" keys that gets PUT to the API as a full replacement.
+ */
 export function AvailabilityEditor({
   language,
   employeeId,

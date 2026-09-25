@@ -6,6 +6,11 @@ import { WorkplacesManager } from './workplacesManager';
 import { PositionsManager } from './positionsManager';
 import { DailyMeetingsManager } from './dailyMeetingsManager';
 
+/**
+ * Settings page, superuser only (redirects other roles to /dashboard).
+ * Fetches workplaces, positions, and daily meetings in parallel and hands
+ * each to its own client-side manager.
+ */
 export default async function SettingsPage({ params }: {
     params: Promise<{ locale: string }>;
 }) {

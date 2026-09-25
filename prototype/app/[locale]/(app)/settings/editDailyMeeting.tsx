@@ -38,6 +38,11 @@ export type DailyMeetingEntry = {
   workplaceId: string;
 };
 
+/**
+ * Create/edit form for a daily meeting. `initialValues` presence selects
+ * create (POST) vs edit (PATCH) mode; `days` is kept as a Set for cheap
+ * toggling and serialized back to an array on submit.
+ */
 export function DailyMeetingForm({
   language,
   initialValues,
@@ -79,6 +84,8 @@ export function DailyMeetingForm({
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
+    // Day selection is a group of toggle buttons, not a native input, so
+    // there is no `required` attribute to rely on for this validation.
     if (days.size === 0) {
       setNoDaysError(true);
       return;

@@ -29,6 +29,11 @@ export const RECURRENCE_TRANSLATION_KEY = {
   MONTHLY: "recurrenceMonthly",
 } as const;
 
+/**
+ * Create/edit form for a checklist item (label, recurrence, category).
+ * Renders as a create form when `initialValues` is omitted, or an edit
+ * form (with delete) otherwise.
+ */
 export function ChecklistItemForm({
   language,
   initialValues,

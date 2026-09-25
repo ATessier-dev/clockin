@@ -12,6 +12,10 @@ export type ActiveEmployee = {
   workplace: { label: string; color: string } | null;
 };
 
+/**
+ * Card listing employees currently clocked in, with their workplace and
+ * clock-in time (`since`).
+ */
 export function ActiveStatusCard({ language, activeEmployees }: { language: Language; activeEmployees: ActiveEmployee[] }) {
   const dateLocale = dateLocales[language];
 

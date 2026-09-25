@@ -7,6 +7,7 @@ import { requireSuperuser, UnauthorizedError, ForbiddenError } from "@/lib/auth/
 // record by hand has no real network context.
 const MANUAL_IP_PLACEHOLDER = "manual";
 
+/** Lists an employee's clock events, optionally filtered by a date range. Superuser only. */
 export async function GET(request: NextRequest) {
   try {
     await requireSuperuser();
@@ -48,6 +49,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/**
+ * Manually creates a clock event for an employee (e.g. to backfill a missed
+ * punch). Superuser only; marks the row as `SUPERUSER_EDIT`.
+ */
 export async function POST(request: Request) {
   try {
     const session = await requireSuperuser();

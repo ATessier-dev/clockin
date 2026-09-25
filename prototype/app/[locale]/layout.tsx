@@ -11,6 +11,10 @@ export const metadata = {
   description: siteConfig.site_description,
 };
 
+/**
+ * Root layout for every locale-prefixed route. 404s (rather than
+ * redirecting) when the locale segment isn't one of `routing.locales`.
+ */
 export default async function LocaleLayout({
   children,
   params,

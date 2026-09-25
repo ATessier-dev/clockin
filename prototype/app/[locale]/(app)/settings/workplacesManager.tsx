@@ -9,6 +9,10 @@ import { PageHeading } from "@/components/ui/pageHeading";
 import { getTranslation, workplacesTranslations, type Language } from "@/translations";
 import { WorkplaceForm, type WorkplaceEntry } from "./editWorkplace";
 
+/**
+ * Lists configured workplaces and toggles the inline create/edit form.
+ * `formMode` holds "create", the workplace being edited, or null.
+ */
 export function WorkplacesManager({
   language,
   workplaces,

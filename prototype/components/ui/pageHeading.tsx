@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+/** Standard page title row: heading, optional description, optional action buttons on the right. */
 export function PageHeading({
   title,
   description,

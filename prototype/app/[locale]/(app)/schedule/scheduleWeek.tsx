@@ -47,6 +47,9 @@ type RawShift = {
   position: { name: string; color: string } | null;
 };
 
+// The "show all" shifts come from a client-side fetch(), so their dates
+// arrive as JSON strings and need converting back to Date objects, unlike
+// myShifts which the server component passes down already as Dates.
 function toShiftListItem(raw: RawShift): ShiftListItem {
   return {
     id: raw.id,
@@ -61,6 +64,12 @@ function toShiftListItem(raw: RawShift): ShiftListItem {
   };
 }
 
+/**
+ * Main weekly schedule view: week navigation, the day-by-day shift list, and
+ * (for superusers) the shift/event forms, week copy, and team availability
+ * panel. Toggling "show all" lazily fetches every employee's shifts once and
+ * caches them in state for the rest of the session on this week.
+ */
 export function ScheduleWeek({
   language,
   weekDays,

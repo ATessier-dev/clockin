@@ -1,5 +1,7 @@
 import { withPrisma } from "@/lib/withPrisma";
 
+// Thrown by recordClockIn/recordClockOut when the employee's current clock
+// state doesn't allow the requested action (e.g. double clock-in).
 export class OpenClockEventConflictError extends Error {
   constructor() {
     super("Employee already has an open clock-in");
@@ -25,6 +27,7 @@ export async function getLatestClockEvent(employeeId: string) {
   );
 }
 
+/** Records a clock-in. Throws OpenClockEventConflictError if the employee is already clocked in. */
 export async function recordClockIn(params: { employeeId: string; workplaceId: string | null; ip: string }) {
   const latest = await getLatestClockEvent(params.employeeId);
   if (latest?.type === "CLOCK_IN") {
@@ -44,6 +47,7 @@ export async function recordClockIn(params: { employeeId: string; workplaceId: s
   );
 }
 
+/** Records a clock-out. Throws NoOpenClockEventError if the employee has no open clock-in. */
 export async function recordClockOut(params: { employeeId: string; workplaceId: string | null; ip: string }) {
   const latest = await getLatestClockEvent(params.employeeId);
   if (latest?.type !== "CLOCK_IN") {

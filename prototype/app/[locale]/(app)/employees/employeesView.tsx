@@ -10,6 +10,7 @@ import { PageHeading } from "@/components/ui/pageHeading";
 import { getTranslation, employeesTranslations, type Language } from "@/translations";
 import { EmployeeForm, type EmployeeEntry, type WorkplaceOption } from "./editEmployee";
 
+/** Superuser employee directory: list of employees plus the create/edit form. */
 export function EmployeesView({
   language,
   employees,

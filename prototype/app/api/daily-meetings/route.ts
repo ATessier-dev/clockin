@@ -21,6 +21,7 @@ function parseDays(value: unknown): DayOfWeek[] | null {
   return days.every((day): day is DayOfWeek => DAYS_OF_WEEK.includes(day as DayOfWeek)) ? days : null;
 }
 
+/** Lists daily meetings ordered by time then display order. Any authenticated employee can read them. */
 export async function GET() {
   try {
     await requireEmployee();
@@ -41,6 +42,7 @@ export async function GET() {
   }
 }
 
+/** Creates a daily meeting appended at the end of the sort order. Superuser only. */
 export async function POST(request: Request) {
   try {
     await requireSuperuser();

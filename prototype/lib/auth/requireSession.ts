@@ -1,5 +1,7 @@
 import { getSession, type SessionPayload } from "@/lib/auth/session";
 
+// Thrown by requireEmployee/requireSuperuser; API routes catch these by name
+// to map them to HTTP 401/403 responses.
 export class UnauthorizedError extends Error {
   constructor() {
     super("Unauthorized");

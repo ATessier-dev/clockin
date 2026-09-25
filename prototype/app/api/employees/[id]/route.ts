@@ -24,6 +24,11 @@ function isUniqueConstraintViolation(error: unknown): boolean {
   );
 }
 
+/**
+ * Updates an employee's profile. An employee may edit their own row; only a
+ * superuser may edit another employee's row or change code/role/active.
+ * Returns 409 if the new login code is already taken.
+ */
 export async function PATCH(request: Request, { params }: RouteContext<"/api/employees/[id]">) {
   try {
     const session = await requireEmployee();

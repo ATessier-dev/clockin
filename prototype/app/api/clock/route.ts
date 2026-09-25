@@ -9,6 +9,10 @@ import {
   NoOpenClockEventError,
 } from "@/lib/clock/recordClockEvent";
 
+/**
+ * Clocks the current employee in or out. Returns 409 if a clock-in is
+ * attempted while already clocked in, or a clock-out with no open clock-in.
+ */
 export async function POST(request: Request) {
   try {
     const session = await requireEmployee();

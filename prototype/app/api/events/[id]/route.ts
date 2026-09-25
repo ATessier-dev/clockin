@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { withPrisma } from "@/lib/withPrisma";
 import { requireSuperuser, UnauthorizedError, ForbiddenError } from "@/lib/auth/requireSession";
 
+/**
+ * Updates a gallery event. Superuser only; 400 if the resulting start/end
+ * range is invalid or end is not after start.
+ */
 export async function PATCH(request: Request, { params }: RouteContext<"/api/events/[id]">) {
   try {
     await requireSuperuser();
@@ -60,6 +64,7 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/eve
   }
 }
 
+/** Deletes a gallery event. Superuser only; 404 if the event doesn't exist. */
 export async function DELETE(request: Request, { params }: RouteContext<"/api/events/[id]">) {
   try {
     await requireSuperuser();

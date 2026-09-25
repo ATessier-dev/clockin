@@ -20,6 +20,11 @@ import { cn } from "@/lib/utils";
 type ItemFormMode = "create" | ChecklistItemEntry | null;
 type CategoryFormMode = "create" | ChecklistCategoryEntry | null;
 
+/**
+ * Renders the checklist page: grouped items by category plus an
+ * uncategorized group, and (for superusers) the forms to create/edit
+ * items and categories.
+ */
 export function ChecklistView({
   language,
   isSuperuser,
@@ -39,6 +44,8 @@ export function ChecklistView({
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [toggleError, setToggleError] = useState<string | null>(null);
 
+  // Only one form (item or category) can be open at a time, so opening
+  // either one closes the other.
   function openItemForm(mode: ItemFormMode) {
     setCategoryFormMode(null);
     setItemFormMode(mode);
@@ -71,6 +78,8 @@ export function ChecklistView({
 
     setTogglingId(null);
 
+    // The API only rejects with "not_owner" (see canUncheck below); any
+    // other failure is treated as unexpected and left unreported here.
     if (!response.ok) {
       const data = (await response.json().catch(() => null)) as { error?: string } | null;
       if (data?.error === "not_owner") {
@@ -82,6 +91,8 @@ export function ChecklistView({
   }
 
   function renderItemRow(item: ChecklistItemEntry) {
+    // Once checked, only a superuser or whoever checked it off can uncheck
+    // it, so a completed item stays visible proof of who handled it.
     const canUncheck = isSuperuser || item.completedByEmployee?.id === currentEmployeeId;
     const checkboxDisabled = togglingId === item.id || (item.completed && !canUncheck);
     return (

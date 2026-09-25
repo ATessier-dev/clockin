@@ -1,5 +1,6 @@
 import type { Translation } from "./types";
 
+// Strings for the employee profile page (personal info and preferences).
 export const profileTranslations: Record<string, Translation> = {
     title: { en: "Profile", fr: "Profil" },
     codeLabel: { en: "Login code (cannot be changed)", fr: "Code de connexion (non modifiable)" },

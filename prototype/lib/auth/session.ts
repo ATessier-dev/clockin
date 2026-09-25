@@ -14,6 +14,7 @@ export type SessionPayload = {
   scope: "clockin";
 };
 
+/** Signs a session JWT for the given employee, valid for SESSION_TTL. */
 export async function createSessionToken(payload: SessionPayload): Promise<string> {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
@@ -22,9 +23,11 @@ export async function createSessionToken(payload: SessionPayload): Promise<strin
     .sign(getSessionSecret());
 }
 
+/** Verifies and decodes a session JWT. Returns null on any invalid signature, shape, or scope, rather than throwing. */
 export async function verifySessionToken(token: string): Promise<SessionPayload | null> {
   try {
     const { payload } = await jwtVerify(token, getSessionSecret());
+    // scope guards against tokens issued by another JWT-based feature that might share the same secret.
     if (payload.scope !== "clockin" || typeof payload.employeeId !== "string") return null;
     if (payload.role !== "EMPLOYEE" && payload.role !== "SUPERUSER") return null;
 
@@ -34,6 +37,7 @@ export async function verifySessionToken(token: string): Promise<SessionPayload 
   }
 }
 
+/** Cookie options for the session cookie; secure is only enforced in production so local dev works over plain HTTP. */
 export function sessionCookieOptions() {
   return {
     httpOnly: true,

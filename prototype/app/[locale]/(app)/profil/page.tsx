@@ -4,10 +4,17 @@ import { type Language } from '@/translations';
 import { ProfileView } from './profileView';
 import { AvailabilityEditor } from './availabilityEditor';
 
+/**
+ * Server-rendered profile page: fetches the current employee, the catalogs
+ * needed to edit it (workplaces, positions), and their availability, then
+ * hands them to the client-side ProfileView and AvailabilityEditor forms.
+ */
 export default async function ProfilPage({ params }: {
     params: Promise<{ locale: string }>;
 }) {
     const { locale } = await params;
+    // Falls back to fr for any unrecognized locale segment rather than
+    // trusting the URL blindly.
     const language = (locale === "en" ? "en" : "fr") as Language;
 
     const sessionUser = await getSession();

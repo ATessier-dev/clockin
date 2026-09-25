@@ -13,6 +13,11 @@ export type WorkplaceOption = { id: string; label: string };
 
 const DATETIME_LOCAL_FORMAT = "yyyy-MM-dd'T'HH:mm";
 
+/**
+ * Converts a persisted clock event into the string-typed values the form
+ * inputs expect: `datetime-local` needs a specific format, and selects/
+ * inputs can't bind to null.
+ */
 export function clockEventToFormDefaults(entry: ClockEventEntry) {
   return {
     id: entry.id,
@@ -23,6 +28,10 @@ export function clockEventToFormDefaults(entry: ClockEventEntry) {
   };
 }
 
+/**
+ * Create/edit form for a clock event. `initialValues` presence (built via
+ * `clockEventToFormDefaults`) selects create (POST) vs edit (PATCH) mode.
+ */
 export function ClockEventForm({
   language,
   employeeId,

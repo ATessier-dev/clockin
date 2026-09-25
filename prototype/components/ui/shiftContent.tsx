@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
+/** Card primitives for displaying a single planning shift (ShiftCard/ShiftTitle/ShiftEmployee/ShiftTime). */
 const ShiftCard = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
     ({ className, ...props }, ref) => (
         <div

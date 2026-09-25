@@ -16,6 +16,11 @@ export type DocLinkEntry = {
   categoryId: string | null;
 };
 
+/**
+ * Create/edit form for a documentation link (title, URL, optional
+ * description, category). Renders as a create form when `initialValues`
+ * is omitted, or an edit form (with delete) otherwise.
+ */
 export function DocLinkForm({
   language,
   initialValues,

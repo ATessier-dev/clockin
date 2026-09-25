@@ -1,5 +1,6 @@
 import type { Translation } from "./types";
 
+// Strings for the login page (employee code entry).
 export const loginTranslations: Record<string, Translation> = {
   title: { en: "Login", fr: "Se connecter" },
   subtitle: {

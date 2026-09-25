@@ -10,6 +10,10 @@ export type ExpectedEmployee = {
   isClockedIn: boolean;
 };
 
+/**
+ * Card listing employees scheduled to work right now, flagging whether
+ * each one has actually clocked in.
+ */
 export function ExpectedStatusCard({
   language,
   expectedEmployees,

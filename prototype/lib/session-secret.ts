@@ -1,5 +1,6 @@
 const LOCAL_DEV_JWT_SECRET = "clockin-local-development-session-secret";
 
+/** Reads JWT_SECRET for session signing. Falls back to a fixed dev secret outside production, but throws in production if unset. */
 export function getSessionSecret(): Uint8Array {
   const jwtSecret = process.env.JWT_SECRET;
 

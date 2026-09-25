@@ -4,6 +4,10 @@ import { type Language } from '@/translations';
 import { isEffectivelyCompleted } from '@/lib/checklist/effectiveCompletion';
 import { ChecklistView } from './checklistView';
 
+/**
+ * Server component: loads checklist items/categories and hands them to
+ * the client `ChecklistView`.
+ */
 export default async function ChecklistPage({ params }: {
     params: Promise<{ locale: string }>;
 }) {
@@ -46,6 +50,9 @@ export default async function ChecklistPage({ params }: {
                         recurrence: item.recurrence,
                         completed,
                         categoryId: item.categoryId,
+                        // Only attribute "checked by" once the completion is still
+                        // effective; a recurring item that's due again shouldn't
+                        // show the previous cycle's checker as having done it.
                         completedByEmployee: completed ? item.completedByEmployee : null,
                     };
                 })}

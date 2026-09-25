@@ -52,6 +52,7 @@ export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
   },
 });
 
+/** Runs a Prisma query against the shared client, logging (and rethrowing) any failure. Use instead of importing `prisma` directly. */
 export async function withPrisma<T>(fn: (_prisma: PrismaClient) => Promise<T>): Promise<T> {
   try {
     return await fn(getPrismaClient());

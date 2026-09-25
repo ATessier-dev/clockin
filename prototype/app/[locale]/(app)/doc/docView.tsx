@@ -13,6 +13,11 @@ import { DocLinkForm, type DocLinkEntry } from "./editDocLink";
 type LinkFormMode = "create" | DocLinkEntry | null;
 type CategoryFormMode = "create" | DocCategoryEntry | null;
 
+/**
+ * Renders the documentation links page: links grouped by category plus an
+ * uncategorized group, and (for superusers) the forms to create/edit
+ * links and categories.
+ */
 export function DocView({
   language,
   isSuperuser,
@@ -28,6 +33,8 @@ export function DocView({
   const [linkFormMode, setLinkFormMode] = useState<LinkFormMode>(null);
   const [categoryFormMode, setCategoryFormMode] = useState<CategoryFormMode>(null);
 
+  // Only one form (link or category) can be open at a time, so opening
+  // either one closes the other.
   function openLinkForm(mode: LinkFormMode) {
     setCategoryFormMode(null);
     setLinkFormMode(mode);

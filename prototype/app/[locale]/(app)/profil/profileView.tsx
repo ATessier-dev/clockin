@@ -22,6 +22,10 @@ export type ProfileEmployee = {
 
 export type PositionOption = { id: string; name: string };
 
+/**
+ * Editable profile form. Saving a locale change navigates to the new locale
+ * instead of showing a "saved" message, since the whole UI language changes.
+ */
 export function ProfileView({
   language,
   employee,

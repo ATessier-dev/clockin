@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { withPrisma } from "@/lib/withPrisma";
 import { requireSuperuser, UnauthorizedError, ForbiddenError } from "@/lib/auth/requireSession";
 
+/**
+ * Edits a clock event's fields. Superuser only; marks the row as
+ * `SUPERUSER_EDIT` and records the editor for audit purposes.
+ */
 export async function PATCH(request: Request, { params }: RouteContext<"/api/clock-events/[id]">) {
   try {
     const session = await requireSuperuser();
@@ -54,6 +58,7 @@ export async function PATCH(request: Request, { params }: RouteContext<"/api/clo
   }
 }
 
+/** Deletes a clock event. Superuser only; 404 if the event doesn't exist. */
 export async function DELETE(request: Request, { params }: RouteContext<"/api/clock-events/[id]">) {
   try {
     await requireSuperuser();

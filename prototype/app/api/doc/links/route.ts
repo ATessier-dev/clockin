@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { withPrisma } from "@/lib/withPrisma";
 import { requireEmployee, requireSuperuser, UnauthorizedError, ForbiddenError } from "@/lib/auth/requireSession";
 
+/** Lists doc links in display order. Any authenticated employee can read them. */
 export async function GET() {
   try {
     await requireEmployee();
@@ -17,6 +18,7 @@ export async function GET() {
   }
 }
 
+/** Creates a doc link appended at the end of the sort order. Superuser only. */
 export async function POST(request: Request) {
   try {
     await requireSuperuser();

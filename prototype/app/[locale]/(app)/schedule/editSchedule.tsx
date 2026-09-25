@@ -15,6 +15,7 @@ export type PositionOption = { id: string; name: string };
 
 const DATETIME_LOCAL_FORMAT = "yyyy-MM-dd'T'HH:mm";
 
+/** Converts a persisted shift into the string-typed defaults the edit form's inputs need. */
 export function shiftToFormDefaults(shift: ShiftListItem) {
   return {
     id: shift.id,
@@ -26,6 +27,10 @@ export function shiftToFormDefaults(shift: ShiftListItem) {
   };
 }
 
+/**
+ * Create/edit form for a shift. `initialValues` presence switches it between
+ * POST (create) and PATCH/DELETE (edit) against the shifts API.
+ */
 export function ShiftForm({
   language,
   employees,
@@ -49,6 +54,8 @@ export function ShiftForm({
   onSaved: () => void;
   onDeleted: () => void;
 }) {
+  // Quick-add from a day card only has a date, so prefill with a sensible
+  // default shift window (11:00-18:00) rather than leaving times empty.
   const defaultStartAt =
     initialValues?.startAt ??
     (initialDate ? format(set(initialDate, { hours: 11, minutes: 0, seconds: 0 }), DATETIME_LOCAL_FORMAT) : "");

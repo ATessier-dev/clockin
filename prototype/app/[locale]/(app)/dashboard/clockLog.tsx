@@ -35,6 +35,11 @@ function groupByDay(entries: ClockLogEntry[]): DayGroup[] {
   return groups.reverse();
 }
 
+/**
+ * Weekly clock-in/out history card with week navigation. `weekStartIso`
+ * comes from the URL (server-provided), so navigating pushes a new
+ * `?week=` query param rather than tracking the week in local state.
+ */
 export function ClockLog({
   language,
   entries,

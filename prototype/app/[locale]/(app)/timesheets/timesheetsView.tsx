@@ -24,6 +24,11 @@ export type ClockEventEntry = {
   workplace: { label: string; color: string } | null;
 };
 
+/**
+ * Client view for one employee's clock events on one day: day/employee
+ * navigation driven by URL search params, the worked-hours total, and the
+ * inline add/edit form for clock events.
+ */
 export function TimesheetsView({
   language,
   employees,

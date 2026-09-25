@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
+/** Sticky top navigation bar shell, with NavBarBrand/NavBarLinks as layout slots. */
 const NavBar = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
     ({ className, ...props }, ref) => (
         <header

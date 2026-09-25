@@ -13,6 +13,7 @@ type LoginResponse = {
   employee: { id: string; firstName: string; lastName: string; role: string };
 };
 
+/** Throws on a non-2xx response so react-query's `isError` reflects an invalid code. */
 async function login(code: string): Promise<LoginResponse> {
   const response = await fetch("/api/auth/login", {
     method: "POST",
@@ -27,6 +28,7 @@ async function login(code: string): Promise<LoginResponse> {
   return response.json();
 }
 
+/** Employee code login form; redirects to /dashboard once login succeeds. */
 export function LoginForm({ language }: { language: Language }) {
   const [code, setCode] = useState("");
   const mutation = useMutation({ mutationFn: login });

@@ -2,6 +2,7 @@ import { format, differenceInMinutes } from "date-fns";
 
 export type ClockEventForDuration = { type: "CLOCK_IN" | "CLOCK_OUT"; at: Date };
 
+/** Normalizes a date to a stable "yyyy-MM-dd" key for grouping worked minutes by day. */
 export function dayKey(date: Date): string {
   return format(date, "yyyy-MM-dd");
 }
@@ -34,6 +35,7 @@ export function computeWorkedMinutes(events: ClockEventForDuration[]): {
   return { totalMinutes, byDay };
 }
 
+/** Formats minutes as "XhYY", omitting the minutes part when it's zero (e.g. "3h" vs "3h05"). */
 export function formatDuration(totalMinutes: number): string {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
