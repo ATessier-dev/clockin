@@ -52,8 +52,9 @@ export const postsTranslations: Record<string, Translation> = {
         fr: "La génération de texte n'est pas encore configurée.",
     },
 
+    chooseTopic: { en: "Choose a topic", fr: "Choisir un sujet" },
+    noTopicsAvailable: { en: "No topics available", fr: "Aucun sujet disponible" },
     untreatedTopics: { en: "Topics to cover", fr: "Sujets à traiter" },
-    noUntreatedTopics: { en: "Every topic has been covered", fr: "Tous les sujets ont été traités" },
     treatedTopics: { en: "Already covered", fr: "Déjà traités" },
     backToTopics: { en: "Back to topics", fr: "Retour aux sujets" },
 

@@ -23,6 +23,10 @@ publiés pour ce même sujet. Ta tâche : écrire un nouveau texte, prêt à
   faits, chiffres, noms, prix ou détails concrets. N'invente rien qui
   n'y figure pas. Si les documents sont minces ou absents, reste
   général plutôt que de fabriquer des détails.
+- Repère les mots-clés et expressions importants du ou des documents
+  de référence (termes techniques, noms de produits ou de marques,
+  expressions qui reviennent) et inclus-les dans le texte, de façon
+  naturelle plutôt que plaquée.
 - Le texte doit donner envie de cliquer, lire, ou réagir, sans tomber
   dans le style publicitaire excessif ni le clickbait trompeur.
 - Écris en français.

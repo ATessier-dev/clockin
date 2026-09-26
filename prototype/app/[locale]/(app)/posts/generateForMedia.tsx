@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Sparkles, RotateCw, Save, X, ArrowLeft, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getTranslation, postsTranslations, type Language } from "@/translations";
 
 type TopicPickerEntry = {
@@ -119,46 +120,36 @@ export function GenerateForMediaPanel({ language, mediaId }: { language: Languag
 
     return (
       <div className="w-full space-y-3 rounded-lg border border-border bg-card p-4">
-        <p className="text-xs font-medium text-muted-foreground">{getTranslation(postsTranslations.untreatedTopics, language)}</p>
-        {untreated.length === 0 ? (
-          <p className="text-xs text-muted-foreground">{getTranslation(postsTranslations.noUntreatedTopics, language)}</p>
+        {topics.length === 0 ? (
+          <p className="text-xs text-muted-foreground">{getTranslation(postsTranslations.noTopicsAvailable, language)}</p>
         ) : (
-          <ul className="space-y-1">
-            {untreated.map((topic) => (
-              <li key={topic.id}>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="h-auto w-full whitespace-normal break-words py-2 text-left leading-snug"
-                  onClick={() => selectTopic(topic.id)}
-                >
-                  {topic.title}
-                </Button>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {treated.length > 0 && (
-          <>
-            <p className="pt-2 text-xs font-medium text-muted-foreground">{getTranslation(postsTranslations.treatedTopics, language)}</p>
-            <ul className="space-y-1">
-              {treated.map((topic) => (
-                <li key={topic.id}>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-auto w-full whitespace-normal break-words py-2 text-left leading-snug"
-                    onClick={() => selectTopic(topic.id)}
-                  >
-                    {topic.title}
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </>
+          <Select onValueChange={selectTopic}>
+            <SelectTrigger>
+              <SelectValue placeholder={getTranslation(postsTranslations.chooseTopic, language)} />
+            </SelectTrigger>
+            <SelectContent>
+              {untreated.length > 0 && (
+                <SelectGroup>
+                  <SelectLabel>{getTranslation(postsTranslations.untreatedTopics, language)}</SelectLabel>
+                  {untreated.map((topic) => (
+                    <SelectItem key={topic.id} value={topic.id}>
+                      {topic.title}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              )}
+              {treated.length > 0 && (
+                <SelectGroup>
+                  <SelectLabel>{getTranslation(postsTranslations.treatedTopics, language)}</SelectLabel>
+                  {treated.map((topic) => (
+                    <SelectItem key={topic.id} value={topic.id}>
+                      {topic.title}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              )}
+            </SelectContent>
+          </Select>
         )}
       </div>
     );
