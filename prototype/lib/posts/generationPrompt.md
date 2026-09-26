@@ -58,6 +58,16 @@ doit être clairement différent : angle différent, accroche différente,
 formulation différente. Ne jamais reprendre une phrase ou une
 accroche déjà utilisée, même reformulée légèrement.
 
+Un changement de phrase d'accroche ne suffit pas si le reste du texte
+reprend les mêmes points concrets dans le même ordre, juste reformulés.
+Choisis un angle réellement différent de ceux déjà utilisés, par exemple :
+un bénéfice concret plutôt qu'un autre, une question posée au lecteur,
+une comparaison avant/après, un témoignage ou point de vue, un chiffre ou
+fait marquant tiré des documents de référence. Si les documents de
+référence ne contiennent pas assez de matière pour un angle vraiment
+distinct, mets en avant des détails ou exemples différents de ceux déjà
+utilisés plutôt que de retraiter les mêmes.
+
 ## Format de sortie
 
 - Réponds uniquement avec le texte du post final, rien d'autre.
