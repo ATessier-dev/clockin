@@ -78,6 +78,7 @@ model Employee {
   editedClockEvents   ClockEvent[]  @relation("EditedByEmployee")
   completedChecklistItems ChecklistItem[] @relation("ChecklistCompletedBy")
   availabilities      EmployeeAvailability[]
+  postGenerations     PostGeneration[]
 
   @@map("employees")
 }
@@ -316,4 +317,85 @@ model ChecklistItem {
 
   @@index([categoryId])
   @@map("checklist_items")
+}
+
+/// Where a generated text can be posted (Reddit, Quora, LinkedIn,
+/// Medium...). Superuser-managed, freeform (not a fixed enum): the client
+/// wants to add/rename/remove destinations without a code change.
+model PostMedia {
+  id        String           @id @default(cuid())
+  name      String
+  sortOrder Int              @default(0) @map("sort_order")
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  generations PostGeneration[]
+
+  // Kept on the existing "post_categories" table (not renamed to
+  // "post_media" at the SQL level): a real table rename isn't something
+  // `prisma db push` reliably preserves data through, and the 4 rows the
+  // client already created here (Reddit/Quora/Linkedin/Medium) matter.
+  // Only the Prisma-level model name changed to match the new meaning.
+  @@map("post_categories")
+}
+
+/// A topic to promote on social media, independent of any one media: the
+/// same topic can be generated for Reddit, then later for LinkedIn.
+/// Superuser-managed. Reference documents (the grounding source for the
+/// LLM) and the cross-media generation history live below it.
+model PostTopic {
+  id          String           @id @default(cuid())
+  title       String
+  /// Set only for a topic imported from an artur.art blog post (see
+  /// lib/posts/arturBlog.ts); null for a manually created topic. Lets a
+  /// refresh detect which artur posts are already imported without
+  /// re-creating duplicates.
+  arturSlug   String?          @unique @map("artur_slug")
+  sortOrder   Int              @default(0) @map("sort_order")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  documents   PostDocument[]
+  generations PostGeneration[]
+
+  // Kept on the existing "post_items" table for the same reason as
+  // PostMedia above: avoids a risky table rename through `db push`.
+  @@map("post_items")
+}
+
+/// A .txt reference document imported for a PostTopic, used as grounding
+/// context by the LLM. Content is stored as-is; no external file storage,
+/// this project has no blob storage infrastructure.
+model PostDocument {
+  id        String    @id @default(cuid())
+  topicId   String    @map("item_id")
+  topic     PostTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  filename  String
+  content   String    @db.Text
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@index([topicId])
+  @@map("post_documents")
+}
+
+/// A text an employee generated for one topic and one media, optionally
+/// edited, and explicitly saved (a plain "generate" doesn't land here
+/// until saved; see app/api/posts/topics/[id]/generate/route.ts). Doubles
+/// as the copy-paste display and as anti-repetition context: the next
+/// generation for the same topic sees every prior PostGeneration
+/// regardless of which media it was for.
+model PostGeneration {
+  id                  String    @id @default(cuid())
+  topicId             String    @map("item_id")
+  topic               PostTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  mediaId             String    @map("media_id")
+  media               PostMedia @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  content             String    @db.Text
+  createdByEmployeeId String    @map("created_by_employee_id")
+  createdByEmployee   Employee  @relation(fields: [createdByEmployeeId], references: [id])
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  @@index([topicId, createdAt])
+  @@index([mediaId, topicId])
+  @@map("post_generations")
 }
