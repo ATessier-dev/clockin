@@ -67,4 +67,16 @@ export const postsTranslations: Record<string, Translation> = {
         en: "Couldn't reach artur.art, try again later.",
         fr: "Impossible de contacter artur.art, réessaie plus tard.",
     },
+
+    identifySectionTitle: { en: "Search by image", fr: "Recherche par image" },
+    identifyHint: {
+        en: "Upload a photo of an artwork to find its title, artist, and description on artur.art.",
+        fr: "Téléverse une photo d'une œuvre pour retrouver son titre, son artiste et sa description sur artur.art.",
+    },
+    identifyUploadButton: { en: "Choose a photo", fr: "Choisir une photo" },
+    identifyAnalyze: { en: "Analyze", fr: "Analyser" },
+    identifyAnalyzing: { en: "Analyzing…", fr: "Analyse…" },
+    identifyInvalidFile: { en: "Only images are accepted.", fr: "Seules les images sont acceptées." },
+    identifyArtistLabel: { en: "Artist", fr: "Artiste" },
+    identifyNoMatch: { en: "No matching artwork found.", fr: "Aucune œuvre correspondante trouvée." },
 };
